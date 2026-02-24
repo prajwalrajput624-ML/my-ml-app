@@ -179,13 +179,15 @@ def main_app():
                 time.sleep(0.01)
                 progress.progress(i + 1)
 
-            prob = pipeline.predict_proba(df)[:,1][0]
-            pred = int(prob >= threshold)
+            # Probabilities rounded to 2 decimal places
+            raw_prob = pipeline.predict_proba(df)[:,1][0]
+            prob_2_decimal = round(float(raw_prob), 2)
+            pred = int(raw_prob >= threshold)
 
             st.session_state.history.insert(0,{
                 "Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "Result": "CHURN" if pred else "STAY",
-                "Probability (%)": round(prob*100,2)
+                "Probability": prob_2_decimal
             })
 
             if pred:
@@ -193,7 +195,7 @@ def main_app():
             else:
                 st.markdown('<div class="result-stay">✅ Customer will STAY</div>', unsafe_allow_html=True)
 
-            st.info(f"📊 Churn Probability: {round(prob*100,2)}%")
+            st.info(f"📊 Churn Probability: {prob_2_decimal}")
 
     # ================= CSV PREDICTION =================
     elif page == "📂 CSV Prediction":
@@ -204,18 +206,17 @@ def main_app():
             df = pd.read_csv(file)
 
             probs = pipeline.predict_proba(df)[:,1]
-            preds = (probs >= threshold).astype(int)
+            # Rounding columns to 2 decimal points
+            df["Churn_Probability"] = probs.round(2)
+            df["Prediction"] = (probs >= threshold).astype(int)
 
-            df["Churn_Probability"] = probs
-            df["Prediction"] = preds
-
-            churn_yes = (preds == 1).sum()
-            churn_no = (preds == 0).sum()
+            churn_yes = (df["Prediction"] == 1).sum()
+            churn_no = (df["Prediction"] == 0).sum()
 
             st.session_state.history.insert(0,{
                 "Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "Result": f"CSV | Yes:{churn_yes} No:{churn_no}",
-                "Probability (%)": "-"
+                "Probability": "-"
             })
 
             c1, c2, c3 = st.columns(3)
@@ -245,8 +246,7 @@ def main_app():
         st.subheader("🧠 Model Information")
         st.markdown("""
         **Model:** XGBoost Classifier  
-        **ROC-AUC Score:** **0.9606**  
-        **Default Threshold:** 0.3  
+        **ROC-AUC Score:** **0.9606** **Default Threshold:** 0.3  
         **Developer:** Prajwal Rajput  
         """)
 
@@ -260,5 +260,4 @@ def main_app():
 if st.session_state.logged_in:
     main_app()
 else:
-
     login_page()
