@@ -179,15 +179,15 @@ def main_app():
                 time.sleep(0.01)
                 progress.progress(i + 1)
 
-            # Probabilities rounded to 2 decimal places
+            # Probabilities rounded to 2 decimal places with Percentage (x100)
             raw_prob = pipeline.predict_proba(df)[:,1][0]
-            prob_2_decimal = round(float(raw_prob), 2)
+            prob_percent = round(float(raw_prob) * 100, 2) 
             pred = int(raw_prob >= threshold)
 
             st.session_state.history.insert(0,{
                 "Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "Result": "CHURN" if pred else "STAY",
-                "Probability": prob_2_decimal
+                "Probability (%)": f"{prob_percent}%"
             })
 
             if pred:
@@ -195,7 +195,7 @@ def main_app():
             else:
                 st.markdown('<div class="result-stay">✅ Customer will STAY</div>', unsafe_allow_html=True)
 
-            st.info(f"📊 Churn Probability: {prob_2_decimal}")
+            st.info(f"📊 Churn Probability: {prob_percent}%")
 
     # ================= CSV PREDICTION =================
     elif page == "📂 CSV Prediction":
@@ -206,8 +206,8 @@ def main_app():
             df = pd.read_csv(file)
 
             probs = pipeline.predict_proba(df)[:,1]
-            # Rounding columns to 2 decimal points
-            df["Churn_Probability"] = probs.round(2)
+            # Probabilities in % format with 2 decimals
+            df["Churn_Probability (%)"] = (probs * 100).round(2)
             df["Prediction"] = (probs >= threshold).astype(int)
 
             churn_yes = (df["Prediction"] == 1).sum()
@@ -216,7 +216,7 @@ def main_app():
             st.session_state.history.insert(0,{
                 "Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "Result": f"CSV | Yes:{churn_yes} No:{churn_no}",
-                "Probability": "-"
+                "Probability (%)": "-"
             })
 
             c1, c2, c3 = st.columns(3)
