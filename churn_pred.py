@@ -7,8 +7,8 @@ from datetime import datetime
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
-    page_title="Bank Customer Churn Predictor",
-    page_icon="📊",
+    page_title="AI Churn Predictor",
+    page_icon="🚀",
     layout="wide"
 )
 
@@ -19,10 +19,6 @@ if "logged_in" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# ================= LOGIN CREDENTIALS =================
-USERNAME = "prajwal"
-PASSWORD = "prajwal6575"
-
 # ================= LOAD MODEL =================
 @st.cache_resource
 def load_model():
@@ -31,242 +27,207 @@ def load_model():
 
 pipeline = load_model()
 
-# ================= TYPING EFFECT =================
-def type_writer(text, speed=0.025):
-    box = st.empty()
-    out = ""
-    for ch in text:
-        out += ch
-        box.markdown(out + "▌")
-        time.sleep(speed)
-    box.markdown(out)
-
-# ================= CSS =================
+# ================= ADVANCED ANIMATED CSS =================
 st.markdown("""
 <style>
-.result-churn {
-    background:#3d0000;
-    padding:15px;
-    border-left:6px solid #ff4b4b;
-    border-radius:10px;
-    color:#ff4b4b;
-    font-size:18px;
-    font-weight:bold;
-}
-.result-stay {
-    background:#003d1f;
-    padding:15px;
-    border-left:6px solid #00ff99;
-    border-radius:10px;
-    color:#00ff99;
-    font-size:18px;
-    font-weight:bold;
-}
-.footer {
-    text-align:center;
-    color:#888;
-    margin-top:40px;
-    padding:15px;
-    font-size:13px;
-    border-top:1px solid #333;
-}
+    /* Animated Gradient Background */
+    .stApp {
+        background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f2027);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+        color: white;
+    }
+
+    @keyframes gradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Glassmorphism Effect for Sidebar and Widgets */
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(10px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stButton>button {
+        width: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #ff8c00, #ff0080);
+        color: white;
+        font-weight: bold;
+        border: none;
+        transition: 0.3s all ease;
+        transform: scale(1);
+    }
+
+    .stButton>button:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 0px 20px rgba(255, 0, 128, 0.6);
+    }
+
+    /* Animated Result Cards */
+    .result-card {
+        padding: 20px;
+        border-radius: 15px;
+        animation: slideIn 0.8s ease-out;
+        border: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .churn-box {
+        background: rgba(255, 75, 75, 0.15);
+        border-left: 10px solid #ff4b4b;
+    }
+
+    .stay-box {
+        background: rgba(0, 255, 153, 0.15);
+        border-left: 10px solid #00ff99;
+    }
+
+    /* Simple Pulse Animation for Text */
+    .pulse {
+        animation: pulse-animation 2s infinite;
+    }
+
+    @keyframes pulse-animation {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ================= LOGIN PAGE =================
 def login_page():
-    st.title("🔐 Secure Login")
+    st.markdown("<h1 style='text-align: center; color: white;'>🔐 Secure AI Portal</h1>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        with st.form("login"):
+            u = st.text_input("Username")
+            p = st.text_input("Password", type="password")
+            btn = st.form_submit_button("Launch Dashboard")
 
-    with st.form("login"):
-        u = st.text_input("Username")
-        p = st.text_input("Password", type="password")
-        btn = st.form_submit_button("Login")
-
-    if btn:
-        if u == USERNAME and p == PASSWORD:
-            st.session_state.logged_in = True
-            st.success("Welcome Prajwal 🚀")
-            time.sleep(0.6)
-            st.rerun()
-        else:
-            st.error("❌ Invalid credentials")
+        if btn:
+            if u == "prajwal" and p == "prajwal6575":
+                st.session_state.logged_in = True
+                st.balloons()
+                st.rerun()
+            else:
+                st.error("Invalid Credentials")
 
 # ================= MAIN APP =================
 def main_app():
-
-    # ========== SIDEBAR ==========
+    # Sidebar
     with st.sidebar:
-        st.header("⚙️ Settings")
-
-        threshold = st.slider(
-            "Sensitivity (Risk Tolerance)",
-            0.1, 0.9, 0.3, 0.05,
-            help="Set the risk threshold. 0.3 is recommended for banking to catch most potential churners."
-        )
-        st.markdown(f"**Current Threshold:** `{threshold}`")
-
-        page = st.radio(
-            "Navigation",
-            ["🔮 Check One Customer", "📂 Batch Analysis (CSV)", "📜 History", "🧠 Model Info"]
-        )
-
+        st.markdown("<h2 class='pulse'>⚙️ Control Center</h2>", unsafe_allow_html=True)
+        threshold = st.slider("Model Sensitivity", 0.1, 0.9, 0.3, 0.05)
+        
+        page = st.selectbox("Navigate To", ["🔮 Predictor", "📂 Batch Process", "📜 Logs"])
+        
         if st.button("🚪 Logout"):
             st.session_state.logged_in = False
             st.rerun()
 
-    st.title("📊 Bank Customer Churn Predictor")
+    st.markdown(f"<h1>🚀 AI Customer Insights <small style='font-size:15px; color:#bbb;'>v3.0</small></h1>", unsafe_allow_html=True)
 
-    # ================= SINGLE PREDICTION =================
-    if page == "🔮 Check One Customer":
-        st.subheader("🧾 Enter Customer Information")
-
-        c1, c2 = st.columns(2)
-
-        with c1:
-            st.markdown("### 👤 Personal Profile")
-            Gender = st.selectbox("Gender", ["Male", "Female"])
-            Education_Level = st.selectbox(
-                "Education Level",
-                ["Uneducated","High School","College","Graduate","Post-Graduate","Doctorate"]
-            )
-            Marital_Status = st.selectbox(
-                "Marital Status", ["Single","Married","Divorced"]
-            )
-            Income_Category = st.selectbox(
-                "Yearly Income Range",
-                ["Less than $40K","$40K - $60K","$60K - $80K","$80K - $120K","$120K +"]
-            )
-            Card_Category = st.selectbox(
-                "Credit Card Type", ["Blue","Silver","Gold","Platinum"]
-            )
-
-        with c2:
-            st.markdown("### 🏦 Banking Activity")
-            Customer_Age = st.number_input("Age", 18, 100, 35)
-            Dependent_count = st.number_input("Number of Dependents", 0, 10, 2)
-            Months_on_book = st.number_input("Tenure with Bank (Months)", 1, 100, 24)
-            Total_Relationship_Count = st.number_input("Total Products Held (Accounts/Loans)", 1, 10, 4)
-            Months_Inactive_12_mon = st.number_input("Months Inactive (Last 12 Months)", 0, 12, 2)
-
-        st.divider()
-        st.markdown("### 💸 Transaction Behavior")
-        c3, c4 = st.columns(2)
+    if page == "🔮 Predictor":
+        st.subheader("Customer Data Entry")
         
-        with c3:
-            Contacts_Count_12_mon = st.number_input("Bank Contacts (Last 12 Months)", 0, 12, 2)
-            Credit_Limit = st.number_input("Total Credit Limit", 500.0, 50000.0, 10000.0)
-            Total_Revolving_Bal = st.number_input("Current Unpaid Balance (Revolving)", 0.0, 50000.0, 1500.0)
-        
-        with c4:
-            Total_Trans_Ct = st.number_input("Total Transaction Count", 1, 300, 60)
-            Total_Ct_Chng_Q4_Q1 = st.number_input("Transaction Trend (Q4 vs Q1)", 0.0, 5.0, 1.2, help="Values < 1.0 indicate decreasing usage.")
-            Avg_Utilization_Ratio = st.number_input("Credit Card Utilization Rate (0 to 1)", 0.0, 1.0, 0.3)
+        # Using columns for layout
+        with st.container():
+            col1, col2 = st.columns(2)
+            with col1:
+                Gender = st.selectbox("Gender", ["Male", "Female"])
+                Education = st.selectbox("Education", ["Uneducated","High School","College","Graduate","Post-Graduate","Doctorate"])
+                Income = st.selectbox("Annual Income", ["Less than $40K","$40K - $60K","$60K - $80K","$80K - $120K","$120K +"])
+                Card = st.selectbox("Card Tier", ["Blue","Silver","Gold","Platinum"])
+                Age = st.slider("Age", 18, 100, 35)
+                Dependents = st.number_input("Dependents", 0, 10, 2)
+            
+            with col2:
+                Tenure = st.number_input("Tenure (Months)", 1, 100, 24)
+                Products = st.number_input("Products Used", 1, 10, 4)
+                Inactive = st.number_input("Months Inactive", 0, 12, 2)
+                Contacts = st.number_input("Bank Contacts", 0, 12, 2)
+                Limit = st.number_input("Credit Limit", 500, 50000, 10000)
+                Revolving = st.number_input("Unpaid Balance", 0, 50000, 1500)
 
-        if st.button("🚀 Analyze Churn Risk"):
-            # Map inputs to model columns
+        col3, col4 = st.columns(2)
+        with col3:
+            Trans_Ct = st.number_input("Total Transactions", 1, 300, 60)
+        with col4:
+            Trend = st.number_input("Activity Trend (Q4/Q1)", 0.0, 5.0, 1.2)
+        
+        Utilization = st.slider("Credit Utilization Rate", 0.0, 1.0, 0.3)
+
+        if st.button("✨ Analyze Risk Now"):
             df = pd.DataFrame({
-                "Gender":[Gender],
-                "Education_Level":[Education_Level],
-                "Marital_Status":[Marital_Status],
-                "Income_Category":[Income_Category],
-                "Card_Category":[Card_Category],
-                "Customer_Age":[Customer_Age],
-                "Dependent_count":[Dependent_count],
-                "Months_on_book":[Months_on_book],
-                "Total_Relationship_Count":[Total_Relationship_Count],
-                "Months_Inactive_12_mon":[Months_Inactive_12_mon],
-                "Contacts_Count_12_mon":[Contacts_Count_12_mon],
-                "Credit_Limit":[Credit_Limit],
-                "Total_Revolving_Bal":[Total_Revolving_Bal],
-                "Total_Trans_Ct":[Total_Trans_Ct],
-                "Total_Ct_Chng_Q4_Q1":[Total_Ct_Chng_Q4_Q1],
-                "Avg_Utilization_Ratio":[Avg_Utilization_Ratio]
+                "Gender":[Gender], "Education_Level":[Education], "Marital_Status":["Single"],
+                "Income_Category":[Income], "Card_Category":[Card], "Customer_Age":[Age],
+                "Dependent_count":[Dependents], "Months_on_book":[Tenure], "Total_Relationship_Count":[Products],
+                "Months_Inactive_12_mon":[Inactive], "Contacts_Count_12_mon":[Contacts], "Credit_Limit":[Limit],
+                "Total_Revolving_Bal":[Revolving], "Total_Trans_Ct":[Trans_Ct], "Total_Ct_Chng_Q4_Q1":[Trend],
+                "Avg_Utilization_Ratio":[Utilization]
             })
 
-            type_writer("🤖 Running AI analysis on behavior patterns...")
+            with st.spinner("🤖 AI Thinking..."):
+                time.sleep(1.5)
+                raw_prob = pipeline.predict_proba(df)[:,1][0]
+                prob_percent = round(float(raw_prob) * 100, 2)
+                pred = int(raw_prob >= threshold)
 
-            progress = st.progress(0)
-            for i in range(100):
-                time.sleep(0.01)
-                progress.progress(i + 1)
-
-            # Calculate probabilities and round to 2 decimals
-            raw_prob = pipeline.predict_proba(df)[:,1][0]
-            prob_percent = round(float(raw_prob) * 100, 2) 
-            pred = int(raw_prob >= threshold)
-
-            st.session_state.history.insert(0,{
-                "Time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "Prediction": "⚠️ LEAVING" if pred else "✅ STAYING",
-                "Risk Score": f"{prob_percent}%"
-            })
-
+            # Animated Results
             if pred:
-                st.markdown(f'<div class="result-churn">❌ HIGH RISK: Customer is likely to CHURN!</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class='result-card churn-box'>
+                    <h2 style='color:#ff4b4b;'>⚠️ HIGH RISK DETECTED</h2>
+                    <p>There is a <b>{prob_percent}%</b> chance this customer will leave.</p>
+                </div>
+                """, unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="result-stay">✅ LOW RISK: Customer is likely to STAY.</div>', unsafe_allow_html=True)
+                st.markdown(f"""
+                <div class='result-card stay-box'>
+                    <h2 style='color:#00ff99;'>✅ CUSTOMER IS LOYAL</h2>
+                    <p>Churn probability is only <b>{prob_percent}%</b>. Everything looks good!</p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            # History log
+            st.session_state.history.insert(0, {"Time": datetime.now().strftime("%H:%M:%S"), "Status": "Risk" if pred else "Safe", "Score": f"{prob_percent}%"})
 
-            st.info(f"📊 Risk Probability Score: {prob_percent}%")
+    elif page == "📂 Batch Process":
+        st.subheader("CSV Intelligence Analysis")
+        uploaded_file = st.file_uploader("Upload bank data...", type="csv")
+        if uploaded_file:
+            data = pd.read_csv(uploaded_file)
+            with st.status("Processing Data...", expanded=True) as status:
+                st.write("Reading file...")
+                time.sleep(1)
+                st.write("Running XGBoost predictions...")
+                probs = pipeline.predict_proba(data)[:,1]
+                data["Risk_Score (%)"] = (probs * 100).round(2)
+                data["Prediction"] = ["LEAVING" if p >= threshold else "STAYING" for p in probs]
+                status.update(label="Analysis Complete!", state="complete", expanded=False)
+            
+            st.dataframe(data.style.background_gradient(subset=['Risk_Score (%)'], cmap='Reds'))
 
-    # ================= CSV PREDICTION =================
-    elif page == "📂 Batch Analysis (CSV)":
-        st.subheader("📂 Bulk Customer Analysis")
-        file = st.file_uploader("Upload CSV File", type=["csv"])
-
-        if file:
-            df = pd.read_csv(file)
-
-            probs = pipeline.predict_proba(df)[:,1]
-            df["Risk_Score (%)"] = (probs * 100).round(2)
-            df["Final_Status"] = ["LEAVING" if p >= threshold else "STAYING" for p in probs]
-
-            churn_yes = (probs >= threshold).sum()
-            churn_no = (probs < threshold).sum()
-
-            c1, c2, c3 = st.columns(3)
-            c1.metric("⚠️ High Risk (Leaving)", churn_yes)
-            c2.metric("✅ Low Risk (Staying)", churn_no)
-            c3.metric("👥 Total Analyzed", len(df))
-
-            st.markdown("### 📊 Churn Distribution")
-            chart_df = pd.DataFrame(
-                {"Customers":[churn_yes, churn_no]},
-                index=["Leaving","Staying"]
-            )
-            st.bar_chart(chart_df, height=300)
-
-            st.dataframe(df, use_container_width=True)
-
-    # ================= HISTORY =================
-    elif page == "📜 History":
-        st.subheader("📜 Recent Prediction History")
+    elif page == "📜 Logs":
+        st.subheader("Recent Activity Logs")
         if st.session_state.history:
-            st.dataframe(pd.DataFrame(st.session_state.history), use_container_width=True)
+            st.table(pd.DataFrame(st.session_state.history))
         else:
-            st.info("No predictions made yet.")
+            st.info("No activity recorded yet.")
 
-    # ================= MODEL INFO =================
-    else:
-        st.subheader("🧠 Model Intelligence")
-        st.markdown(f"""
-        This system utilizes a **XGBoost Classifier** to analyze banking behavior and predict potential customer exits.
-        
-        **Model Accuracy:** 92%  
-        **ROC-AUC Score:** 0.96  
-        **Current Sensitivity:** {threshold}  
-        
-        ---
-        **Key Churn Indicators:**
-        * Declining Transaction Counts (Q4 vs Q1)
-        * High Number of Bank Contacts
-        * Long Periods of Inactivity
-        """)
-
-    # ================= FOOTER =================
-    st.markdown(
-        "<div class='footer'>© 2026 Developed by | Prajwal Rajput</div>",
-        unsafe_allow_html=True
-    )
+    # Footer
+    st.markdown(f"<div class='footer'>AI Core: XGBoost | Developed by Prajwal Rajput | {datetime.now().year}</div>", unsafe_allow_html=True)
 
 # ================= ROUTER =================
 if st.session_state.logged_in:
