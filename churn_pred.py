@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import time
+import xgboost as xgb
 from datetime import datetime
 
 # ================= PAGE CONFIG =================
@@ -259,4 +260,5 @@ def main_app():
 if st.session_state.logged_in:
     main_app()
 else:
+
     login_page()
