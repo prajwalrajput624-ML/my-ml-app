@@ -4,6 +4,7 @@ import pickle
 import time
 import xgboost as xgb
 from datetime import datetime
+import io
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
@@ -22,6 +23,7 @@ if "history" not in st.session_state:
 # ================= LOAD MODEL =================
 @st.cache_resource
 def load_model():
+    # Make sure this file exists in your directory
     with open("banker_churn.pkl", "rb") as f:
         return pickle.load(f)
 
@@ -30,7 +32,6 @@ pipeline = load_model()
 # ================= ADVANCED ANIMATED CSS =================
 st.markdown("""
 <style>
-    /* Animated Gradient Background */
     .stApp {
         background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f2027);
         background-size: 400% 400%;
@@ -44,7 +45,6 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
 
-    /* Glassmorphism Effect for Sidebar and Widgets */
     [data-testid="stSidebar"] {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px);
@@ -59,7 +59,6 @@ st.markdown("""
         font-weight: bold;
         border: none;
         transition: 0.3s all ease;
-        transform: scale(1);
     }
 
     .stButton>button:hover {
@@ -67,7 +66,6 @@ st.markdown("""
         box-shadow: 0px 0px 20px rgba(255, 0, 128, 0.6);
     }
 
-    /* Animated Result Cards */
     .result-card {
         padding: 20px;
         border-radius: 15px;
@@ -81,25 +79,21 @@ st.markdown("""
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .churn-box {
-        background: rgba(255, 75, 75, 0.15);
-        border-left: 10px solid #ff4b4b;
-    }
-
-    .stay-box {
-        background: rgba(0, 255, 153, 0.15);
-        border-left: 10px solid #00ff99;
-    }
-
-    /* Simple Pulse Animation for Text */
-    .pulse {
-        animation: pulse-animation 2s infinite;
-    }
-
+    .churn-box { background: rgba(255, 75, 75, 0.15); border-left: 10px solid #ff4b4b; }
+    .stay-box { background: rgba(0, 255, 153, 0.15); border-left: 10px solid #00ff99; }
+    
+    .pulse { animation: pulse-animation 2s infinite; }
     @keyframes pulse-animation {
         0% { opacity: 1; }
         50% { opacity: 0.5; }
         100% { opacity: 1; }
+    }
+
+    .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        opacity: 0.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -107,14 +101,12 @@ st.markdown("""
 # ================= LOGIN PAGE =================
 def login_page():
     st.markdown("<h1 style='text-align: center; color: white;'>🔐 Secure AI Portal</h1>", unsafe_allow_html=True)
-    
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         with st.form("login"):
             u = st.text_input("Username")
             p = st.text_input("Password", type="password")
             btn = st.form_submit_button("Launch Dashboard")
-
         if btn:
             if u == "prajwal" and p == "prajwal6575":
                 st.session_state.logged_in = True
@@ -125,13 +117,10 @@ def login_page():
 
 # ================= MAIN APP =================
 def main_app():
-    # Sidebar
     with st.sidebar:
         st.markdown("<h2 class='pulse'>⚙️ Control Center</h2>", unsafe_allow_html=True)
         threshold = st.slider("Model Sensitivity", 0.1, 0.9, 0.3, 0.05)
-        
         page = st.selectbox("Navigate To", ["🔮 Predictor", "📂 Batch Process", "📜 Logs"])
-        
         if st.button("🚪 Logout"):
             st.session_state.logged_in = False
             st.rerun()
@@ -140,8 +129,6 @@ def main_app():
 
     if page == "🔮 Predictor":
         st.subheader("Customer Data Entry")
-        
-        # Using columns for layout
         with st.container():
             col1, col2 = st.columns(2)
             with col1:
@@ -151,7 +138,6 @@ def main_app():
                 Card = st.selectbox("Card Tier", ["Blue","Silver","Gold","Platinum"])
                 Age = st.slider("Age", 18, 100, 35)
                 Dependents = st.number_input("Dependents", 0, 10, 2)
-            
             with col2:
                 Tenure = st.number_input("Tenure (Months)", 1, 100, 24)
                 Products = st.number_input("Products Used", 1, 10, 4)
@@ -161,11 +147,8 @@ def main_app():
                 Revolving = st.number_input("Unpaid Balance", 0, 50000, 1500)
 
         col3, col4 = st.columns(2)
-        with col3:
-            Trans_Ct = st.number_input("Total Transactions", 1, 300, 60)
-        with col4:
-            Trend = st.number_input("Activity Trend (Q4/Q1)", 0.0, 5.0, 1.2)
-        
+        with col3: Trans_Ct = st.number_input("Total Transactions", 1, 300, 60)
+        with col4: Trend = st.number_input("Activity Trend (Q4/Q1)", 0.0, 5.0, 1.2)
         Utilization = st.slider("Credit Utilization Rate", 0.0, 1.0, 0.3)
 
         if st.button("✨ Analyze Risk Now"):
@@ -177,60 +160,57 @@ def main_app():
                 "Total_Revolving_Bal":[Revolving], "Total_Trans_Ct":[Trans_Ct], "Total_Ct_Chng_Q4_Q1":[Trend],
                 "Avg_Utilization_Ratio":[Utilization]
             })
-
             with st.spinner("🤖 AI Thinking..."):
                 time.sleep(1.5)
                 raw_prob = pipeline.predict_proba(df)[:,1][0]
                 prob_percent = round(float(raw_prob) * 100, 2)
                 pred = int(raw_prob >= threshold)
 
-            # Animated Results
             if pred:
-                st.markdown(f"""
-                <div class='result-card churn-box'>
-                    <h2 style='color:#ff4b4b;'>⚠️ HIGH RISK DETECTED</h2>
-                    <p>There is a <b>{prob_percent}%</b> chance this customer will leave.</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(f"<div class='result-card churn-box'><h2 style='color:#ff4b4b;'>⚠️ HIGH RISK DETECTED</h2><p>Probability: <b>{prob_percent}%</b></p></div>", unsafe_allow_html=True)
             else:
-                st.markdown(f"""
-                <div class='result-card stay-box'>
-                    <h2 style='color:#00ff99;'>✅ CUSTOMER IS LOYAL</h2>
-                    <p>Churn probability is only <b>{prob_percent}%</b>. Everything looks good!</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # History log
+                st.markdown(f"<div class='result-card stay-box'><h2 style='color:#00ff99;'>✅ CUSTOMER IS LOYAL</h2><p>Probability: <b>{prob_percent}%</b></p></div>", unsafe_allow_html=True)
             st.session_state.history.insert(0, {"Time": datetime.now().strftime("%H:%M:%S"), "Status": "Risk" if pred else "Safe", "Score": f"{prob_percent}%"})
 
     elif page == "📂 Batch Process":
         st.subheader("CSV Intelligence Analysis")
         uploaded_file = st.file_uploader("Upload bank data...", type="csv")
+        
         if uploaded_file:
             data = pd.read_csv(uploaded_file)
             with st.status("Processing Data...", expanded=True) as status:
                 st.write("Reading file...")
-                time.sleep(1)
-                st.write("Running XGBoost predictions...")
                 probs = pipeline.predict_proba(data)[:,1]
                 data["Risk_Score (%)"] = (probs * 100).round(2)
                 data["Prediction"] = ["LEAVING" if p >= threshold else "STAYING" for p in probs]
                 status.update(label="Analysis Complete!", state="complete", expanded=False)
             
-            st.dataframe(data.style.background_gradient(subset=['Risk_Score (%)'], cmap='Reds'))
+            # --- DOWNLOAD SECTION ---
+            st.markdown("### 📥 Download Results")
+            csv_buffer = io.StringIO()
+            data.to_csv(csv_buffer, index=False)
+            csv_output = csv_buffer.getvalue()
+
+            col_dl, _ = st.columns([1,2])
+            with col_dl:
+                st.download_button(
+                    label="📥 Download Processed CSV",
+                    data=csv_output,
+                    file_name=f"churn_analysis_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
+                    mime="text/csv",
+                    help="Click to download the analyzed file with predictions."
+                )
+            
+            st.divider()
+            st.dataframe(data.style.background_gradient(subset=['Risk_Score (%)'], cmap='Reds'), use_container_width=True)
 
     elif page == "📜 Logs":
         st.subheader("Recent Activity Logs")
         if st.session_state.history:
             st.table(pd.DataFrame(st.session_state.history))
-        else:
-            st.info("No activity recorded yet.")
+        else: st.info("No activity recorded yet.")
 
-    # Footer
     st.markdown(f"<div class='footer'>AI Core: XGBoost | Developed by Prajwal Rajput | {datetime.now().year}</div>", unsafe_allow_html=True)
 
-# ================= ROUTER =================
-if st.session_state.logged_in:
-    main_app()
-else:
-    login_page()
+if st.session_state.logged_in: main_app()
+else: login_page()
