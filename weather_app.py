@@ -16,19 +16,9 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Full Dark Background */
-    .stApp {
-        background-color: #05070a;
-        color: #e2e8f0;
-    }
+    .stApp { background-color: #05070a; color: #e2e8f0; }
+    [data-testid="stSidebar"] { background-color: #0a0f16; border-right: 1px solid #1e293b; }
     
-    /* Sidebar Dark Styling */
-    [data-testid="stSidebar"] {
-        background-color: #0a0f16;
-        border-right: 1px solid #1e293b;
-    }
-
-    /* Gemini Glowing Wave Animation */
     @keyframes moveGradient {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -36,23 +26,19 @@ st.markdown("""
     }
     
     .gemini-loader {
-        height: 4px;
-        width: 100%;
+        height: 4px; width: 100%;
         background: linear-gradient(-45deg, #4285f4, #9b72cb, #d96570, #10b981);
         background-size: 400% 400%;
         animation: moveGradient 3s linear infinite;
-        border-radius: 10px;
-        margin: 20px 0;
+        border-radius: 10px; margin: 20px 0;
         box-shadow: 0 0 15px rgba(155, 114, 203, 0.4);
     }
 
-    /* Glassmorphism Cards */
     .result-card {
         background: rgba(30, 41, 59, 0.4);
         backdrop-filter: blur(12px);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 25px;
-        border-radius: 20px;
+        padding: 25px; border-radius: 20px;
         animation: fadeIn 0.8s ease-out;
     }
 
@@ -61,7 +47,6 @@ st.markdown("""
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Button Styling */
     .stButton>button {
         background: linear-gradient(90deg, #1e40af, #7c3aed);
         color: white; border: none; border-radius: 12px;
@@ -100,41 +85,16 @@ def login_page():
 if not st.session_state['logged_in']:
     login_page()
 else:
-    # --- Sidebar ---
     with st.sidebar:
-        st.markdown(f"""
-            <div style='text-align: center; padding: 10px;'>
-                <h2 style='color: #818cf8; margin-bottom: 0;'>SkyCast Admin</h2>
-                <p style='color: #94a3b8; font-size: 0.9em;'>Status: Active Session</p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<div style='text-align: center; padding: 10px;'><h2 style='color: #818cf8; margin-bottom: 0;'>SkyCast Admin</h2><p style='color: #94a3b8; font-size: 0.9em;'>Status: Active Session</p></div>", unsafe_allow_html=True)
         st.divider()
-
         st.markdown("### 🧠 Model Intelligence")
-        st.markdown("""
-            <div style='background: rgba(30, 41, 59, 0.7); padding: 15px; border-radius: 12px; border: 1px solid #1e293b;'>
-                <p style='color: #94a3b8; margin-bottom: 5px; font-size: 0.85em;'>Architecture</p>
-                <h4 style='color: #34d399; margin-top: 0;'>XGBoost Classifier</h4>
-                <hr style='opacity: 0.1; margin: 10px 0;'>
-                <div style='display: flex; justify-content: space-between;'>
-                    <div>
-                        <p style='color: #94a3b8; margin: 0; font-size: 0.75em;'>ROC AUC</p>
-                        <p style='color: #818cf8; font-weight: bold; margin: 0;'>0.96+</p>
-                    </div>
-                    <div>
-                        <p style='color: #94a3b8; margin: 0; font-size: 0.75em;'>ACCURACY</p>
-                        <p style='color: #818cf8; font-weight: bold; margin: 0;'>92%</p>
-                    </div>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
+        st.markdown("<div style='background: rgba(30, 41, 59, 0.7); padding: 15px; border-radius: 12px; border: 1px solid #1e293b;'><p style='color: #94a3b8; margin-bottom: 5px; font-size: 0.85em;'>Architecture</p><h4 style='color: #34d399; margin-top: 0;'>XGBoost Classifier</h4><hr style='opacity: 0.1; margin: 10px 0;'><div style='display: flex; justify-content: space-between;'><div><p style='color: #94a3b8; margin: 0; font-size: 0.75em;'>ROC AUC</p><p style='color: #818cf8; font-weight: bold; margin: 0;'>0.96+</p></div><div><p style='color: #94a3b8; margin: 0; font-size: 0.75em;'>ACCURACY</p><p style='color: #818cf8; font-weight: bold; margin: 0;'>92%</p></div></div></div>", unsafe_allow_html=True)
         st.divider()
         if st.button("🚪 Logout", use_container_width=True):
             st.session_state['logged_in'] = False
             st.rerun()
 
-    # --- Header ---
     st.markdown("<h1 style='color: #f8fafc; margin-bottom:0;'>🌦️ Weather Intelligence Dashboard</h1>", unsafe_allow_html=True)
     st.markdown("<p style='color: #94a3b8;'>Deployed by <b>Prajwal Rajput</b> | 33-Dimensional Inference Engine</p>", unsafe_allow_html=True)
     st.divider()
@@ -148,47 +108,53 @@ else:
 
     model = load_model()
 
-    # --- Input Section ---
     st.subheader("📡 Environmental Sensors")
     c1, c2 = st.columns(2)
     with c1:
         country = st.selectbox("Region", ["India"])
         city = st.selectbox("Monitoring Node", ["Surat", "Ahmedabad", "Mumbai", "Delhi"])
-        temp = st.slider("Temperature (°C)", -10.0, 50.0, 25.0)
-        hum = st.slider("Humidity (%)", 0, 100, 50)
-        wind_dir = st.selectbox("Wind Vector", ["N", "NE", "E", "SE", "S", "SW", "W", "NW"])
+        temp = st.slider("Temperature (°C)", -10.0, 50.0, 23.0)
+        hum = st.slider("Humidity (%)", 0, 100, 74)
+        wind_dir = st.selectbox("Wind Vector", ["SW", "N", "NE", "E", "SE", "S", "W", "NW"])
 
     with c2:
-        press = st.slider("Barometric Pressure (mb)", 950, 1050, 1012)
+        press = st.slider("Barometric Pressure (mb)", 950, 1050, 1009)
         cloud = st.slider("Cloud Cover (%)", 0, 100, 25)
-        wind_s = st.number_input("Velocity (kph)", 0.0, 150.0, 15.0)
-        uv = st.slider("UV Radiation Index", 0.0, 15.0, 4.0)
-        feels = st.slider("Apparent Temp (°C)", -10.0, 55.0, 27.0)
+        wind_s = st.number_input("Velocity (kph)", 0.0, 150.0, 11.2)
+        uv = st.slider("UV Radiation Index", 0.0, 15.0, 0.0)
+        feels = st.slider("Apparent Temp (°C)", -10.0, 55.0, 25.0)
 
-    # --- Prediction Execution ---
     if st.button("🚀 Run AI Forecasting Engine"):
         if model is None:
             st.error("Fatal Error: Model file 'weather_model.joblib' not found.")
         else:
             st.markdown('<div class="gemini-loader"></div>', unsafe_allow_html=True)
             status_placeholder = st.empty()
-            
-            for step in ["Initializing Neural Weights...", "Injecting 23 Derived Features...", "Running XGBoost Inference..."]:
+            for step in ["Initializing Neural Weights...", "Injecting 33 Features...", "Running XGBoost Inference..."]:
                 status_placeholder.markdown(f"<p style='color:#818cf8; text-align:center;'>{step}</p>", unsafe_allow_html=True)
-                time.sleep(0.7)
+                time.sleep(0.5)
             
-            # Backend 33-Column Logic
+            # --- FIXED LOGIC FOR RAIN PREDICTION ---
+            # Humidty aur Pressure ke base par condition ko dynamic banaya gaya hai
+            derived_condition = "rain" if (hum > 80 or press < 1005) else "clear"
+            precip_val = 2.5 if hum > 80 else 0.0
+            vis_val = 5.0 if hum > 80 else 10.0
+
             data_dict = {
                 "country": country.lower(), "location_name": city.lower(), "temperature_celsius": temp,
                 "feels_like_celsius": feels, "humidity": hum, "pressure_mb": press, 
                 "cloud": cloud, "wind_kph": wind_s, "wind_direction": wind_dir.lower(), "uv_index": uv,
-                "timezone": "Asia/Kolkata", "moon_phase": "waxing", "condition_text": "clear",
+                "timezone": "Asia/Kolkata", "moon_phase": "waxing", 
+                "condition_text": derived_condition, # Dynamic Condition
                 "latitude": 21.17, "longitude": 72.83, "temperature_fahrenheit": temp * 1.8 + 32,
                 "feels_like_fahrenheit": feels * 1.8 + 32, "wind_mph": wind_s * 0.62,
-                "wind_degree": 180, "pressure_in": press * 0.029, "precip_mm": 0.0, "precip_in": 0.0,
-                "visibility_km": 10.0, "visibility_miles": 6.0, "gust_kph": wind_s * 1.1,
-                "gust_mph": wind_s * 0.7, "air_quality_Carbon_Monoxide": 200.0,
-                "air_quality_Sulphur_dioxide": 5.0, "air_quality_PM2.5": 15.0, "air_quality_PM10": 25.0,
+                "wind_degree": 180, "pressure_in": press * 0.029, 
+                "precip_mm": precip_val, # Dynamic Precipitation
+                "precip_in": precip_val * 0.039,
+                "visibility_km": vis_val, "visibility_miles": vis_val * 0.62, 
+                "gust_kph": wind_s * 1.1, "gust_mph": wind_s * 0.7, 
+                "air_quality_Carbon_Monoxide": 200.0, "air_quality_Sulphur_dioxide": 5.0, 
+                "air_quality_PM2.5": 15.0, "air_quality_PM10": 25.0,
                 "air_quality_us-epa-index": 1, "air_quality_gb-defra-index": 1,
                 "moon_illumination": 45, "last_updated_epoch": int(time.time())
             }
@@ -199,9 +165,8 @@ else:
 
             st.markdown('<div class="result-card">', unsafe_allow_html=True)
             r1, r2 = st.columns(2)
-            
             with r1:
-                st.markdown(f"<h3 style='color:#94a3b8; margin-top:0;'>Precipitation Risk</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color:#94a3b8; margin-top:0;'>Precipitation Risk</h3>", unsafe_allow_html=True)
                 st.markdown(f"<h1 style='color:#818cf8; font-size: 3.5em; margin:0;'>{prob*100:.1f}%</h1>", unsafe_allow_html=True)
                 st.progress(prob)
             
@@ -212,16 +177,11 @@ else:
                 else:
                     st.markdown("<h2 style='color:#34d399; margin-top:0;'>☀️ Clear Weather</h2>", unsafe_allow_html=True)
                     if uv > 6:
-                        st.info(f"**AI Tip:** It's bright out! UV Index is {uv}, so wear sunglasses 🕶️ and apply sunscreen.")
+                        st.info(f"**AI Tip:** It's bright out! UV Index is {uv}, so wear sunglasses 🕶️.")
                     elif temp > 35:
-                        st.info(f"**AI Tip:** It's getting hot! Stay hydrated 💧 and avoid direct sunlight.")
+                        st.info("**AI Tip:** It's getting hot! Stay hydrated 💧.")
                     else:
-                        st.success(f"**AI Tip:** Perfect weather! 🌈 It's a great day for outdoor activities.")
+                        st.success("**AI Tip:** Perfect weather! 🌈 Great for outdoor activities.")
             st.markdown('</div>', unsafe_allow_html=True)
 
-    # --- Footer ---
-    st.markdown(f"""
-        <div style='text-align:center; margin-top:80px; padding: 20px; color:#475569; border-top: 1px solid #1e293b;'>
-            <p style='margin:0; font-weight:bold; color:#818cf8;'>@2026 Deployed by | Prajwal Rajput</p>
-        </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; margin-top:80px; padding: 20px; color:#475569; border-top: 1px solid #1e293b;'><p style='margin:0; font-weight:bold; color:#818cf8;'>@2026 Deployed by | Prajwal Rajput</p></div>", unsafe_allow_html=True)
