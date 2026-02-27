@@ -9,7 +9,7 @@ from datetime import datetime
 # 1. PAGE CONFIG & DARK GLOW UI
 # ==========================================
 st.set_page_config(
-    page_title="SkyCast AI",
+    page_title="SkyCast AI Pro",
     page_icon="🌌",
     layout="wide"
 )
@@ -68,7 +68,7 @@ if 'logged_in' not in st.session_state:
 def login_page():
     _, col, _ = st.columns([1, 1.2, 1])
     with col:
-        st.markdown("<br><br><h1 style='text-align: center; color: #818cf8;'>🔐 SkyCast AI</h1>", unsafe_allow_html=True)
+        st.markdown("<br><br><h1 style='text-align: center; color: #818cf8;'>🔐SKYCAST-AI</h1>", unsafe_allow_html=True)
         with st.form("login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
@@ -95,8 +95,16 @@ else:
             st.session_state['logged_in'] = False
             st.rerun()
 
-    st.markdown("<h1 style='color: #f8fafc; margin-bottom:0;'>🌦️ Weather Intelligence Dashboard</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #94a3b8;'>Deployed by <b>Prajwal Rajput</b> | 33-Dimensional Inference Engine</p>", unsafe_allow_html=True)
+    # --- UPDATED HEADER WITH ICON ---
+    st.markdown("""
+        <div style='display: flex; align-items: center; gap: 20px;'>
+            <span style='font-size: 3.5rem;'>🌌</span>
+            <div>
+                <h1 style='color: #f8fafc; margin-bottom:0;'>SkyCast Weather Intelligence</h1>
+                <p style='color: #94a3b8; margin-top:0;'>Deployed by <b>Prajwal Rajput</b> | 33-Dimensional Inference Engine</p>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
     st.divider()
 
     @st.cache_resource
@@ -134,8 +142,7 @@ else:
                 status_placeholder.markdown(f"<p style='color:#818cf8; text-align:center;'>{step}</p>", unsafe_allow_html=True)
                 time.sleep(0.5)
             
-            # --- FIXED LOGIC FOR RAIN PREDICTION ---
-            # Humidty aur Pressure ke base par condition ko dynamic banaya gaya hai
+            # Dynamic Feature Logic
             derived_condition = "rain" if (hum > 80 or press < 1005) else "clear"
             precip_val = 2.5 if hum > 80 else 0.0
             vis_val = 5.0 if hum > 80 else 10.0
@@ -145,11 +152,11 @@ else:
                 "feels_like_celsius": feels, "humidity": hum, "pressure_mb": press, 
                 "cloud": cloud, "wind_kph": wind_s, "wind_direction": wind_dir.lower(), "uv_index": uv,
                 "timezone": "Asia/Kolkata", "moon_phase": "waxing", 
-                "condition_text": derived_condition, # Dynamic Condition
+                "condition_text": derived_condition,
                 "latitude": 21.17, "longitude": 72.83, "temperature_fahrenheit": temp * 1.8 + 32,
                 "feels_like_fahrenheit": feels * 1.8 + 32, "wind_mph": wind_s * 0.62,
                 "wind_degree": 180, "pressure_in": press * 0.029, 
-                "precip_mm": precip_val, # Dynamic Precipitation
+                "precip_mm": precip_val,
                 "precip_in": precip_val * 0.039,
                 "visibility_km": vis_val, "visibility_miles": vis_val * 0.62, 
                 "gust_kph": wind_s * 1.1, "gust_mph": wind_s * 0.7, 
@@ -185,5 +192,3 @@ else:
             st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='text-align:center; margin-top:80px; padding: 20px; color:#475569; border-top: 1px solid #1e293b;'><p style='margin:0; font-weight:bold; color:#818cf8;'>@2026 Deployed by | Prajwal Rajput</p></div>", unsafe_allow_html=True)
-
-
