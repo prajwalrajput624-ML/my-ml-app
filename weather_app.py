@@ -186,3 +186,4 @@ else:
 
     st.markdown("<div style='text-align:center; margin-top:80px; padding: 20px; color:#475569; border-top: 1px solid #1e293b;'><p style='margin:0; font-weight:bold; color:#818cf8;'>@2026 Deployed by | Prajwal Rajput</p></div>", unsafe_allow_html=True)
 
+
