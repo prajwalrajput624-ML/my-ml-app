@@ -91,7 +91,7 @@ st.markdown("""
 
 # ================= LOGIN PAGE =================
 def login_page():
-    st.markdown("<h1 style='text-align: center; color: white;'>🔐 Secure AI Portal</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: white;'>🔐 Churn-AI Login</h1>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
         with st.form("login"):
@@ -214,3 +214,4 @@ def main_app():
 
 if st.session_state.logged_in: main_app()
 else: login_page()
+
