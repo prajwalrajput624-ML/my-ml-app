@@ -9,7 +9,7 @@ from datetime import datetime
 # 1. PAGE CONFIG & DARK GLOW UI
 # ==========================================
 st.set_page_config(
-    page_title="SkyCast AI Pro",
+    page_title="SkyCast AI",
     page_icon="🌌",
     layout="wide"
 )
@@ -68,7 +68,7 @@ if 'logged_in' not in st.session_state:
 def login_page():
     _, col, _ = st.columns([1, 1.2, 1])
     with col:
-        st.markdown("<br><br><h1 style='text-align: center; color: #818cf8;'>🔐 SkyCast AI Access</h1>", unsafe_allow_html=True)
+        st.markdown("<br><br><h1 style='text-align: center; color: #818cf8;'>🔐 SkyCast AI</h1>", unsafe_allow_html=True)
         with st.form("login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
@@ -185,3 +185,4 @@ else:
             st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("<div style='text-align:center; margin-top:80px; padding: 20px; color:#475569; border-top: 1px solid #1e293b;'><p style='margin:0; font-weight:bold; color:#818cf8;'>@2026 Deployed by | Prajwal Rajput</p></div>", unsafe_allow_html=True)
+
