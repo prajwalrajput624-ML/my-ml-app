@@ -6,7 +6,7 @@ import plotly.express as px
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="Loan Approval AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Loan Approval AI", page_icon="🛡️", layout="wide")
 
 # 2. Premium UI Styling
 st.markdown("""
@@ -162,3 +162,4 @@ if submit:
         st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval AI v2.0</p>", unsafe_allow_html=True)
+
