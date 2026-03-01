@@ -6,7 +6,7 @@ import plotly.express as px
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="Loan Approval AI", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Loan Approval-AI", page_icon="🛡️", layout="wide")
 
 # 2. Premium UI Styling
 st.markdown("""
@@ -59,9 +59,13 @@ def load_assets():
 model = load_assets()
 
 # --- HEADER ---
-st.markdown("<h1 class='main-title'>🛡️Loan Approval-AI </h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🛡️Loan Approval-AI</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'><b>Production-Grade Risk Engine</b> | Developed by Prajwal Rajput @2026</p>", unsafe_allow_html=True)
 
 # --- FORM ---
+with st.form("master_form"):
+    st.warning("⚠️ **System Alert:** Extreme DTI ratios or low FICO scores will trigger automatic rejection.")
+    c1, c2, c3 = st.columns(3)
     
     with c1:
         st.markdown("<div class='section-head'>👤 Applicant</div>", unsafe_allow_html=True)
@@ -87,7 +91,7 @@ st.markdown("<h1 class='main-title'>🛡️Loan Approval-AI </h1>", unsafe_allow
         dti = loan_amt / income
         st.write(f"**DTI Impact:** `{dti:.2f}`")
 
-    submit = st.form_submit_button("⚡ RUN Loan Approval-AI")
+    submit = st.form_submit_button("⚡ RUN NEURAL VALIDATION")
 
 # --- CORE LOGIC (AI + HARD GUARDRAILS) ---
 if submit:
@@ -157,7 +161,4 @@ if submit:
                      'steps': [{'range': [0, 30], 'color': "#dcfce7"}, {'range': [70, 100], 'color': "#fee2e2"}]}))
         st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval-AI </p>", unsafe_allow_html=True)
-
-
-
+st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval-AI</p>", unsafe_allow_html=True)
