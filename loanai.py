@@ -1,39 +1,39 @@
 import streamlit as st
 import pandas as pd
 import pickle
+import plotly.graph_objects as go
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="AI Credit Intelligence", page_icon="💳", layout="wide")
+st.set_page_config(page_title="CrediPulse AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
 
-# 2. Advanced Custom CSS
+# 2. Ultra-Modern Glassmorphism CSS
 st.markdown("""
     <style>
     .stApp { background: radial-gradient(circle at 10% 20%, rgb(239, 246, 255) 0%, rgb(219, 234, 254) 100%); }
     div[data-testid="stVerticalBlock"] > div:has(div.stForm) {
-        background: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(15px);
-        padding: 50px; border-radius: 30px;
+        padding: 40px; border-radius: 25px;
         border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        box-shadow: 0 10px 40px rgba(31, 38, 135, 0.1);
     }
     .main-title {
         background: -webkit-linear-gradient(#4f46e5, #9333ea);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 45px; font-weight: 900; text-align: center;
+        font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 0px;
     }
-    .section-head { color: #1e293b; font-size: 20px; font-weight: 700; margin-top: 30px; }
+    .section-head { color: #1e293b; font-size: 18px; font-weight: 700; border-left: 4px solid #6366f1; padding-left: 10px; margin-top: 20px; }
     .stButton>button {
         background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-        color: white !important; border-radius: 15px !important;
-        font-weight: 700 !important; width: 100%; height: 50px;
+        color: white !important; border-radius: 12px !important; font-weight: 700 !important; height: 50px; width: 100%; border: none;
     }
-    .footer { text-align: center; padding: 40px; color: #6366f1; font-weight: 600; }
+    .footer { text-align: center; padding: 40px; color: #4b5563; font-size: 14px; font-weight: 600; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. PDF Generator (Fixed NameError)
+# 3. PDF Generator Function
 def generate_pdf(data_dict):
     pdf = FPDF()
     pdf.add_page()
@@ -41,96 +41,104 @@ def generate_pdf(data_dict):
     pdf.set_text_color(79, 70, 229) 
     pdf.cell(0, 15, text="CREDIT RISK ASSESSMENT REPORT", ln=True, align='C')
     pdf.ln(10)
-    
-    pdf.set_font("helvetica", size=12)
-    pdf.set_text_color(30, 41, 59)
+    pdf.set_font("helvetica", size=12); pdf.set_text_color(30, 41, 59)
     for key, value in data_dict.items():
-        # FIXED: Variable name consistency
         clean_line = f"{key}: {value}".encode('ascii', 'ignore').decode('ascii')
         pdf.cell(0, 10, text=clean_line, ln=True)
-    
     pdf.ln(20)
     pdf.set_font("helvetica", "B", 10)
-    pdf.cell(0, 10, text="Developed by Prajwal Rajput AI-system", ln=True, align='R')
+    pdf.cell(0, 10, text="Verified by CrediPulse AI - Developed by Prajwal Rajput @2026", ln=True, align='R')
     return bytes(pdf.output())
 
 # 4. Model Loader
 @st.cache_resource
-def load_model():
+def load_engine():
     try:
         with open('loan_models.pkl', 'rb') as f:
             return pickle.load(f)
     except: return None
 
-model = load_model()
+model = load_engine()
 
-# --- UI Layout ---
-st.markdown("<h1 class='main-title'>🛡️ AI Loan Intelligence</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #64748b;'>Developed by Prajwal Rajput</p>", unsafe_allow_html=True)
+# --- HEADER ---
+st.markdown("<h1 class='main-title'>🛡️ CrediPulse AI</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #64748b;'>13-Feature Neural Risk Engine | <b>Developed by Prajwal Rajput</b></p>", unsafe_allow_html=True)
 
-with st.form("modern_form"):
-    st.markdown("<div class='section-head'>👤 Applicant Profile</div>", unsafe_allow_html=True)
+# --- FORM (The 13 Datapoints) ---
+with st.form("master_neural_form"):
+    st.markdown("<div class='section-head'>👤 Applicant Demographics</div>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
-    age = c1.number_input("Current Age", 18, 100, 30)
-    gender = c2.selectbox("Gender", ["Male", "Female"])
-    edu = c3.selectbox("Education", ["High School", "Bachelor", "Master", "Associate", "Doctorate"])
+    f1_age = c1.number_input("Age", 18, 100, 30)
+    f2_gender = c2.selectbox("Gender", ["male", "female"])
+    f3_edu = c3.selectbox("Education", ["high school", "bachelor", "master", "associate", "doctorate"])
+    
+    st.markdown("<div class='section-head'>📊 Financial Portfolio</div>", unsafe_allow_html=True)
+    c1, c2, c3 = st.columns(3)
+    f4_income = c1.number_input("Annual Income ($)", 1000, 1000000, 55000)
+    f5_exp = c2.number_input("Work Experience (Years)", 0.0, 50.0, 5.0)
+    f6_home = c3.selectbox("Residential Status", ["mortgage", "rent", "own", "other"])
     
     c1, c2 = st.columns(2)
-    exp = c1.number_input("Work Tenure (Years)", 0.0, 50.0, 5.0)
-    home = c2.selectbox("Residential Status", ["Mortgage", "Rent", "Own", "Other"])
+    f7_fico = c1.number_input("FICO Credit Score", 300, 850, 720)
+    f8_cred_hist = c2.number_input("Credit History Length (Years)", 0, 50, 8)
+    f9_default = st.radio("Historical Defaults?", ["no", "yes"], horizontal=True)
 
-    st.markdown("<div class='section-head'>📊 Financial Intelligence</div>", unsafe_allow_html=True)
+    st.markdown("<div class='section-head'>💰 Requested Facilities</div>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
-    income = c1.number_input("Annual Income ($)", 1000, 1000000, 50000)
-    fico = c2.number_input("FICO Credit Score", 300, 850, 720)
-    cred_age = c3.number_input("Credit Age (Years)", 0, 50, 8)
-    default_his = st.radio("Have you defaulted in the past?", ["No", "Yes"], horizontal=True)
+    f10_loan_amt = c1.number_input("Loan Principal ($)", 100, 500000, 15000)
+    f11_rate = c2.number_input("Interest Rate (%)", 0.0, 35.0, 11.2)
+    f12_intent = c3.selectbox("Loan Utility", ["personal", "education", "medical", "venture", "homeimprovement", "debtconsolidation"])
+    
+    # Feature 13: Auto-Calculation of DTI
+    f13_dti = f10_loan_amt / f4_income
+    st.write(f"**Feature 13: Debt-to-Income (DTI) Impact:** `{f13_dti:.2f}`")
 
-    st.markdown("<div class='section-head'>💰 Loan Requirements</div>", unsafe_allow_html=True)
-    c1, c2, c3 = st.columns(3)
-    loan_amt = c1.number_input("Requested Amount ($)", 100, 500000, 15000)
-    intent = c2.selectbox("Purpose", ["Personal", "Education", "Medical", "Venture", "Home Improvement", "Debt Consolidation"])
-    rate = c3.number_input("Interest Rate (%)", 0.0, 35.0, 10.5)
+    submit = st.form_submit_button("⚡ EXECUTE AI VALIDATION")
 
-    submit = st.form_submit_button("⚡ RUN AI VALIDATION")
-
-# --- Processing ---
+# --- RESULTS ENGINE ---
 if submit and model:
-    dti = loan_amt / income
-    monthly_int = (rate / 100) / 12
-    emi = (loan_amt * monthly_int * (1 + monthly_int)**60) / ((1 + monthly_int)**60 - 1)
+    # Constructing 13-Feature DataFrame
+    input_data = pd.DataFrame({
+        'person_age': [f1_age], 'person_income': [f4_income], 'person_emp_exp': [f5_exp],
+        'loan_amnt': [f10_loan_amt], 'loan_int_rate': [f11_rate], 'loan_percent_income': [f13_dti],
+        'cb_person_cred_hist_length': [f8_cred_hist], 'credit_score': [f7_fico],
+        'person_gender': [f2_gender.lower()], 'person_education': [f3_edu.lower()],
+        'person_home_ownership': [f6_home.lower()], 'loan_intent': [f12_intent.lower()],
+        'previous_loan_defaults_on_file': [f9_default.lower()]
+    })
 
-    if dti > 0.60 or fico < 450:
-        st.error("### ❌ Risk Threshold Exceeded")
-    else:
-        input_data = pd.DataFrame({
-            'person_age': [age], 'person_income': [income], 'person_emp_exp': [exp],
-            'loan_amnt': [loan_amt], 'loan_int_rate': [rate], 'loan_percent_income': [dti],
-            'cb_person_cred_hist_length': [cred_age], 'credit_score': [fico],
-            'person_gender': [gender.lower()], 'person_education': [edu.lower()],
-            'person_home_ownership': [home.lower()], 'loan_intent': [intent.replace(" ", "").lower()],
-            'previous_loan_defaults_on_file': [default_his.lower()]
-        })
-        
-        prob = model.predict_proba(input_data)[0][1] * 100
-        
-        st.markdown("---")
-        if prob > 35:
-            st.error(f"### ❌ High Default Probability: {prob:.1f}%")
-        else:
-            st.success("### ✅ Application Approved by AI")
-            st.progress(int(prob), text=f"Risk Intensity: {prob:.1f}%")
-
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("Risk Score", f"{prob:.1f}%")
-            m2.metric("Monthly EMI", f"${emi:.2f}")
-            m3.metric("DTI Ratio", f"{dti:.1%}")
-            m4.metric("FICO Status", "Prime" if fico > 700 else "Subprime")
-
-            rep_data = {"Status": "Approved", "FICO": fico, "Risk": f"{prob:.1f}%", "EMI": f"${emi:.2f}"}
-            pdf_out = generate_pdf(rep_data)
-            # FIXED: file_name as string
-            st.download_button("📥 DOWNLOAD REPORT", data=pdf_out, file_name="Loan_Assessment_Report.pdf")
+    risk_prob = model.predict_proba(input_data)[0][1] * 100
+    
+    st.markdown("---")
+    res_l, res_r = st.columns([1, 1.2])
+    
+    with res_l:
+        st.subheader("Decision Summary")
+        if risk_prob < 15:
+            st.success("✅ **APPROVED**")
             st.balloons()
+        elif risk_prob < 40:
+            st.warning("⚠️ **PENDING REVIEW**")
+        else:
+            st.error("❌ **REJECTED**")
+            
+        st.metric("Risk Probability", f"{risk_prob:.1f}%")
+        emi = (f10_loan_amt * (f11_rate/1200)) / (1 - (1 + f11_rate/1200)**-60)
+        st.metric("Estimated EMI", f"${emi:.2f}")
 
-st.markdown("<p class='footer'>DEVELOPED BY PRAJWAL RAJPUT</p>", unsafe_allow_html=True)
+    with res_r:
+        # Professional Gauge
+        fig = go.Figure(go.Indicator(
+            mode = "gauge+number", value = risk_prob,
+            title = {'text': "Neural Risk Meter"},
+            gauge = {'axis': {'range': [0, 100]},
+                     'bar': {'color': "#6366f1"},
+                     'steps': [{'range': [0, 30], 'color': "#dcfce7"},
+                               {'range': [70, 100], 'color': "#fee2e2"}]}))
+        st.plotly_chart(fig, use_container_width=True)
+
+        report_data = {"Status": "Verified", "Score": f7_fico, "Risk": f"{risk_prob:.1f}%", "DTI": f"{f13_dti:.2f}"}
+        pdf = generate_pdf(report_data)
+        st.download_button("📥 DOWNLOAD ASSESSMENT REPORT", data=pdf, file_name="CrediPulse_Report.pdf")
+
+st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | 13-Feature Architecture</p>", unsafe_allow_html=True)
