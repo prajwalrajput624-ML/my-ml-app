@@ -7,6 +7,8 @@ matplotlib
 seaborn
 plotly
 xgboost
+fpdf
 joblib
+
 
 
