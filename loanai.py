@@ -6,7 +6,7 @@ import plotly.express as px
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="CrediPulse AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Loan Approval-AI", page_icon="🛡️", layout="wide")
 
 # 2. Premium UI Styling
 st.markdown("""
@@ -45,7 +45,7 @@ def generate_pdf(data_dict):
         pdf.cell(0, 10, text=clean_line, ln=True)
     pdf.ln(20)
     pdf.set_font("helvetica", "B", 10)
-    pdf.cell(0, 10, text="Verified by CrediPulse AI - Developed by Prajwal Rajput @2026", ln=True, align='R')
+    pdf.cell(0, 10, text="Verified by Loan Approval-AI - Developed by Prajwal Rajput @2026", ln=True, align='R')
     return bytes(pdf.output())
 
 # 4. Model Assets Loading
@@ -60,7 +60,7 @@ def load_assets():
 model = load_assets()
 
 # --- HEADER ---
-st.markdown("<h1 class='main-title'>🛡️ CrediPulse AI</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🛡️ Loan Approval-AI</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 18px; color: #475569;'>Advanced 13-Feature Neural Risk Engine | <b>Developed by Prajwal Rajput</b></p>", unsafe_allow_html=True)
 st.markdown("---")
 
@@ -164,3 +164,4 @@ if submit:
         st.error("Model Error: Ensure 'loan_models.pkl' is in the project folder.")
 
 st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | CrediPulse AI v2.0 | Neural Architecture</p>", unsafe_allow_html=True)
+
