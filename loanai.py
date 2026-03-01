@@ -6,7 +6,7 @@ import plotly.express as px
 from fpdf import FPDF
 
 # 1. Page Configuration
-st.set_page_config(page_title="CrediPulse AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
+st.set_page_config(page_title="Loan Approval AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
 
 # 2. Premium UI Styling
 st.markdown("""
@@ -31,7 +31,24 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Assets Loading
+# 3. PDF Generator Function
+def generate_pdf(data_dict):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("helvetica", "B", 18)
+    pdf.set_text_color(79, 70, 229) 
+    pdf.cell(0, 15, text="LOAN ASSESSMENT REPORT", ln=True, align='C')
+    pdf.ln(10)
+    pdf.set_font("helvetica", size=12); pdf.set_text_color(30, 41, 59)
+    for key, value in data_dict.items():
+        clean_line = f"{key}: {value}".encode('ascii', 'ignore').decode('ascii')
+        pdf.cell(0, 10, text=clean_line, ln=True)
+    pdf.ln(20)
+    pdf.set_font("helvetica", "B", 10)
+    pdf.cell(0, 10, text="Verified by Loan Approval AI - Developed by Prajwal Rajput @2026", ln=True, align='R')
+    return bytes(pdf.output())
+
+# 4. Assets Loading
 @st.cache_resource
 def load_assets():
     try:
@@ -42,7 +59,7 @@ def load_assets():
 model = load_assets()
 
 # --- HEADER ---
-st.markdown("<h1 class='main-title'>🛡️ CrediPulse AI v2.0</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🛡️ Loan Approval AI v2.0</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center;'><b>Production-Grade Risk Engine</b> | Developed by Prajwal Rajput @2026</p>", unsafe_allow_html=True)
 
 # --- FORM ---
@@ -78,7 +95,6 @@ with st.form("master_form"):
 
 # --- CORE LOGIC (AI + HARD GUARDRAILS) ---
 if submit:
-    # 🚨 HARD GUARDRAILS (Fixes the wrong approval)
     hard_reject = False
     rejection_reasons = []
 
@@ -96,9 +112,8 @@ if submit:
         st.error("### ❌ STATUS: AUTOMATIC REJECTION")
         for reason in rejection_reasons:
             st.write(f"🔴 **Reason:** {reason}")
-        risk_prob = 99.9  # Forced High Risk
+        risk_prob = 99.9  
     elif model:
-        # AI ML Prediction
         input_df = pd.DataFrame({
             'person_age': [age], 'person_income': [income], 'person_emp_exp': [exp],
             'loan_amnt': [loan_amt], 'loan_int_rate': [rate], 'loan_percent_income': [dti],
@@ -108,8 +123,6 @@ if submit:
             'previous_loan_defaults_on_file': [default.lower()]
         })
         risk_prob = model.predict_proba(input_df)[0][1] * 100
-        
-        # Adjustment for behavioral risk
         if default.lower() == 'yes': risk_prob += 5.0
 
         if risk_prob < 20:
@@ -120,12 +133,24 @@ if submit:
         else:
             st.error("❌ **STATUS: REJECTED**")
     
-    # Visuals
+    # Result Visuals
     res_l, res_r = st.columns([1, 1.2])
     with res_l:
         st.metric("Risk Probability", f"{risk_prob:.1f}%")
         emi = (loan_amt * (rate/1200)) / (1 - (1 + rate/1200)**-60) if income > 0 else 0
         st.metric("Monthly EMI", f"${emi:.2f}")
+        
+        # --- PDF REPORT BUTTON ---
+        report_data = {
+            "Decision": "Approved" if risk_prob < 50 else "Rejected",
+            "FICO Score": fico,
+            "Risk Score": f"{risk_prob:.1f}%",
+            "Loan Amount": f"${loan_amt}",
+            "Monthly EMI": f"${emi:.2f}",
+            "DTI Ratio": f"{dti:.2f}"
+        }
+        pdf_bytes = generate_pdf(report_data)
+        st.download_button("📥 DOWNLOAD ASSESSMENT REPORT", data=pdf_bytes, file_name="Loan_Assessment_Report.pdf")
     
     with res_r:
         fig = go.Figure(go.Indicator(
@@ -136,4 +161,4 @@ if submit:
                      'steps': [{'range': [0, 30], 'color': "#dcfce7"}, {'range': [70, 100], 'color': "#fee2e2"}]}))
         st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | CrediPulse v2.0</p>", unsafe_allow_html=True)
+st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval AI v2.0</p>", unsafe_allow_html=True)
