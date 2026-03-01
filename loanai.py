@@ -45,7 +45,7 @@ def generate_pdf(data_dict):
         pdf.cell(0, 10, text=clean_line, ln=True)
     pdf.ln(20)
     pdf.set_font("helvetica", "B", 10)
-    pdf.cell(0, 10, text="Verified by Loan Approval AI - Developed by Prajwal Rajput @2026", ln=True, align='R')
+    pdf.cell(0, 10, text="Verified by Loan Approval-AI Developed by Prajwal Rajput @2026", ln=True, align='R')
     return bytes(pdf.output())
 
 # 4. Assets Loading
@@ -59,13 +59,9 @@ def load_assets():
 model = load_assets()
 
 # --- HEADER ---
-st.markdown("<h1 class='main-title'>🛡️ Loan Approval-AI </h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'><b>Production-Grade Risk Engine</b> | Developed by Prajwal Rajput @2026</p>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🛡️Loan Approval-AI </h1>", unsafe_allow_html=True)
 
 # --- FORM ---
-with st.form("master_form"):
-    st.warning("⚠️ **System Alert:** Extreme DTI ratios or low FICO scores will trigger automatic rejection.")
-    c1, c2, c3 = st.columns(3)
     
     with c1:
         st.markdown("<div class='section-head'>👤 Applicant</div>", unsafe_allow_html=True)
@@ -162,5 +158,6 @@ if submit:
         st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval-AI </p>", unsafe_allow_html=True)
+
 
 
