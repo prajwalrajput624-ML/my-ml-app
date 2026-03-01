@@ -8,7 +8,7 @@ from fpdf import FPDF
 # 1. Page Configuration
 st.set_page_config(page_title="CrediPulse AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
 
-# 2. Premium UI Styling (Glassmorphism & Professional Themes)
+# 2. Premium UI Styling
 st.markdown("""
     <style>
     .stApp { background: #f8fafc; }
@@ -55,7 +55,6 @@ def load_assets():
         with open('loan_models.pkl', 'rb') as f:
             return pickle.load(f)
     except Exception as e:
-        st.error(f"Error loading model: {e}")
         return None
 
 model = load_assets()
@@ -96,13 +95,12 @@ with st.form("credipulse_master_form"):
         dti = loan_amt / income
         st.write(f"**13. Loan % Income (DTI):** `{dti:.2f}`")
 
-    st.markdown("<br>", unsafe_allow_html=True)
     submit = st.form_submit_button("🚀 INITIATE NEURAL VALIDATION")
 
 # --- RESULTS ENGINE ---
 if submit:
     if model:
-        # Constructing 13-Feature DataFrame matching model order
+        # Constructing 13-Feature DataFrame
         input_df = pd.DataFrame({
             'person_age': [age], 'person_income': [income], 'person_emp_exp': [emp_exp],
             'loan_amnt': [loan_amt], 'loan_int_rate': [int_rate], 'loan_percent_income': [dti],
@@ -115,15 +113,19 @@ if submit:
         # Run Prediction
         risk_prob = model.predict_proba(input_df)[0][1] * 100
         
+        # Realistic Baseline for Default History
+        if default.lower() == 'yes' and risk_prob < 5:
+            risk_prob += 2.5 
+
         st.markdown("---")
         res_l, res_r = st.columns([1, 1.2])
         
         with res_l:
             st.subheader("Decision Summary")
-            if risk_prob < 15:
+            if risk_prob < 20:
                 st.success("✅ **STATUS: APPROVED**")
                 st.balloons()
-            elif risk_prob < 40:
+            elif risk_prob < 50:
                 st.warning("⚠️ **STATUS: PENDING REVIEW**")
             else:
                 st.error("❌ **STATUS: REJECTED**")
@@ -133,7 +135,6 @@ if submit:
             st.metric("Estimated Monthly EMI", f"${emi:.2f}")
 
         with res_r:
-            # Neural Risk Meter (Gauge Chart)
             fig = go.Figure(go.Indicator(
                 mode = "gauge+number", value = risk_prob,
                 title = {'text': "Neural Risk Meter"},
@@ -152,15 +153,14 @@ if submit:
 
         # Feature Importance Visualization
         st.markdown("### 🧬 AI Decision Drivers")
-        
         feat_imp = pd.DataFrame({
             'Feature': ['Income', 'DTI', 'Loan Amt', 'FICO', 'Rate', 'Exp', 'Default', 'Age', 'Edu', 'Home', 'Intent', 'Gender', 'Hist'],
-            'Impact': [0.28, 0.22, 0.15, 0.12, 0.08, 0.05, 0.04, 0.02, 0.015, 0.01, 0.005, 0.005, 0.005]
-        }).sort_values('Impact', ascending=True)
+            'Weight': [0.28, 0.22, 0.15, 0.12, 0.08, 0.05, 0.04, 0.02, 0.015, 0.01, 0.005, 0.005, 0.005]
+        }).sort_values('Weight', ascending=True)
         
-        fig_imp = px.bar(feat_imp, x='Impact', y='Feature', orientation='h', color='Impact', color_continuous_scale='Viridis')
+        fig_imp = px.bar(feat_imp, x='Weight', y='Feature', orientation='h', color='Weight', color_continuous_scale='Viridis')
         st.plotly_chart(fig_imp, use_container_width=True)
     else:
-        st.error("Model not found. Please ensure 'loan_models.pkl' is in the directory.")
+        st.error("Model Error: Ensure 'loan_models.pkl' is in the project folder.")
 
 st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | CrediPulse AI v2.0 | Neural Architecture</p>", unsafe_allow_html=True)
