@@ -7,50 +7,66 @@ import plotly.express as px
 import numpy as np
 import os
 
-# ================= 1. SYSTEM CONFIG =================
-pd.set_option("styler.render.max_elements", 1500000)
-st.set_page_config(page_title="Loan Approval AI-System", layout="wide")
+# ================= PAGE CONFIG =================
+st.set_page_config(page_title="Loan Approval AI System", layout="wide")
 
+# ================= STYLE =================
 st.markdown("""
 <style>
-.stApp { background-color: #0E1117; color: #FFFFFF; }
-.stButton>button { width: 100%; border-radius: 10px; background: #10a37f; color: white; font-weight: bold; height: 3em; }
-.stButton>button:hover { background: #0d8a6a; transform: scale(1.01); }
-.main-header { text-align: center; color: #10a37f; margin-bottom: 20px; }
-.footer {
-    position: fixed; left: 0; bottom: 0; width: 100%;
-    background-color: #161b22; color: #8b949e; text-align: center;
-    padding: 10px; border-top: 1px solid #30363d;
-}
+.stApp { background-color: #0E1117; color: white; }
+.stButton>button { width: 100%; background: #10a37f; color: white; border-radius: 8px; height: 3em; }
+.stButton>button:hover { background: #0d8a6a; }
+.header { text-align:center; color:#10a37f; }
+.footer { position: fixed; bottom: 0; width: 100%; background: #161b22;
+          text-align:center; padding:10px; color:#8b949e; }
 </style>
 """, unsafe_allow_html=True)
 
-# ================= 2. LOGIN =================
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
+# ================= LOGIN SYSTEM =================
+if "auth" not in st.session_state:
+    st.session_state.auth = False
 
-if not st.session_state.authenticated:
-    st.markdown("<h1 class='main-header'>🛡️ Secure Login</h1>", unsafe_allow_html=True)
+if not st.session_state.auth:
+    st.markdown("<h1 class='header'>🔐 Secure Login</h1>", unsafe_allow_html=True)
     with st.form("login"):
-        user = st.text_input("Username")
-        pwd = st.text_input("Password", type="password")
+        u = st.text_input("Username")
+        p = st.text_input("Password", type="password")
         if st.form_submit_button("Login"):
-            if user == "prajwal" and pwd == "prajwal6575":
-                st.session_state.authenticated = True
+            if u == "prajwal" and p == "prajwal6575":
+                st.session_state.auth = True
                 st.rerun()
             else:
                 st.error("Invalid Credentials")
     st.stop()
 
-# ================= 3. LOAD MODEL =================
+# ================= MODEL LOADING =================
 @st.cache_resource
 def load_model():
     model_path = "loan_model.pkl"
+
     if not os.path.exists(model_path):
-        st.error("Model file not found!")
+        st.error("❌ loan_model.pkl not found.")
         return None
-    with open(model_path, "rb") as f:
-        return pickle.load(f)
+
+    try:
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+
+        # Safety check
+        if isinstance(model, str):
+            st.error("❌ Model file contains string, not trained model.")
+            return None
+
+        if not hasattr(model, "predict_proba"):
+            st.error("❌ Loaded object is not a valid sklearn model.")
+            return None
+
+        return model
+
+    except Exception as e:
+        st.error(f"Model Load Error: {e}")
+        return None
+
 
 pipeline = load_model()
 if pipeline is None:
@@ -67,11 +83,11 @@ required_cols = [
 ]
 
 # ================= SIDEBAR =================
-st.sidebar.write("Active Session: **Prajwal Rajput**")
-mode = st.sidebar.radio("Navigation", ["Individual Scan", "Upload CSV Batch"])
+st.sidebar.write("Active Session: Prajwal Rajput")
+mode = st.sidebar.radio("Navigation", ["Individual Scan", "Batch CSV Scan"])
 
 if st.sidebar.button("Logout"):
-    st.session_state.authenticated = False
+    st.session_state.auth = False
     st.rerun()
 
 # =====================================================
@@ -79,7 +95,7 @@ if st.sidebar.button("Logout"):
 # =====================================================
 if mode == "Individual Scan":
 
-    st.markdown("<h2 class='main-header'>Single Applicant Neural Analysis</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='header'>Single Applicant Analysis</h2>", unsafe_allow_html=True)
 
     with st.form("single"):
         col1, col2 = st.columns(2)
@@ -124,9 +140,9 @@ if mode == "Individual Scan":
             prob = pipeline.predict_proba(data)[0][1]
             risk = prob
 
-            colA, colB = st.columns(2)
+            c1, c2 = st.columns(2)
 
-            with colA:
+            with c1:
                 if risk < 0.25:
                     st.success("✅ APPROVED")
                     st.metric("Confidence", f"{100-(risk*100):.2f}%")
@@ -135,7 +151,7 @@ if mode == "Individual Scan":
                     st.error("❌ REJECTED")
                     st.metric("Risk Score", f"{risk:.2%}")
 
-            with colB:
+            with c2:
                 fig = go.Figure(go.Indicator(
                     mode="gauge+number",
                     value=risk*100,
@@ -152,9 +168,9 @@ if mode == "Individual Scan":
 # =====================================================
 else:
 
-    st.markdown("<h2 class='main-header'>Batch Loan Processor</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 class='header'>Batch Loan Processing</h2>", unsafe_allow_html=True)
 
-    file = st.file_uploader("Upload CSV", type="csv")
+    file = st.file_uploader("Upload CSV File", type="csv")
 
     if file:
         df = pd.read_csv(file)
@@ -198,7 +214,7 @@ else:
 
                 with col2:
                     csv = df.to_csv(index=False).encode("utf-8")
-                    st.download_button("Download CSV",
+                    st.download_button("Download Results CSV",
                                        data=csv,
                                        file_name="loan_results.csv",
                                        mime="text/csv")
@@ -206,6 +222,6 @@ else:
                 st.dataframe(df, use_container_width=True)
 
             except Exception as e:
-                st.error(f"Batch Error: {e}")
+                st.error(f"Batch Prediction Error: {e}")
 
 st.markdown("<div class='footer'>Developed @2026 by Prajwal Rajput</div>", unsafe_allow_html=True)
