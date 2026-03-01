@@ -59,7 +59,7 @@ def load_assets():
 model = load_assets()
 
 # --- HEADER ---
-st.markdown("<h1 class='main-title'>🛡️ Loan Approval AI v2.0</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title'>🛡️ Loan Approval-AI </h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center;'><b>Production-Grade Risk Engine</b> | Developed by Prajwal Rajput @2026</p>", unsafe_allow_html=True)
 
 # --- FORM ---
@@ -91,7 +91,7 @@ with st.form("master_form"):
         dti = loan_amt / income
         st.write(f"**DTI Impact:** `{dti:.2f}`")
 
-    submit = st.form_submit_button("⚡ RUN NEURAL VALIDATION")
+    submit = st.form_submit_button("⚡ RUN Loan Approval-AI")
 
 # --- CORE LOGIC (AI + HARD GUARDRAILS) ---
 if submit:
@@ -161,5 +161,6 @@ if submit:
                      'steps': [{'range': [0, 30], 'color': "#dcfce7"}, {'range': [70, 100], 'color': "#fee2e2"}]}))
         st.plotly_chart(fig, use_container_width=True)
 
-st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval AI v2.0</p>", unsafe_allow_html=True)
+st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | Loan Approval-AI </p>", unsafe_allow_html=True)
+
 
