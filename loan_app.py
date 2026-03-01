@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import pickle  # Pickle load karne ke liye
+import joblib  # Pickle se better hai ML models ke liye
 import time
 import plotly.graph_objects as go
 import plotly.express as px
@@ -43,24 +43,22 @@ if not st.session_state.authenticated:
                     st.error("Invalid Credentials")
     st.stop()
 
-# ================= 3. PICKLE MODEL LOAD (FIXED) =================
+# ================= 3. MODEL LOAD (FIXED LOGIC) =================
 @st.cache_resource
-def load_pickle_model():
-    model_file = 'loan_model.pkl'  # Aapki pickle file ka naam
+def load_model():
+    # Aapki file ka sahi naam yahan check karein (loan_model.joblib ya loan_model.pkl)
+    model_file = 'loan_models.joblib' 
     if os.path.exists(model_file):
         try:
-            # Pickle ke liye 'rb' (read binary) mode zaroori hai
-            with open(model_file, 'rb') as f:
-                model = pickle.load(f)
-            return model
+            return joblib.load(model_file)
         except Exception as e:
-            st.error(f"Pickle Load Error: {e}")
+            st.error(f"Error loading model: {e}")
             return None
     else:
-        st.error(f"File '{model_file}' not found in GitHub!")
+        st.error(f"File '{model_file}' not found in the repository!")
         return None
 
-pipeline = load_pickle_model()
+pipeline = load_model()
 if pipeline is None:
     st.stop()
 
@@ -71,7 +69,7 @@ if st.sidebar.button("🔒 Logout"):
     st.session_state.authenticated = False
     st.rerun()
 
-# ================= 5. INDIVIDUAL SCAN =================
+# ================= 5. MODE 1: INDIVIDUAL SCAN =================
 if mode == "Individual Scan":
     st.markdown("<h2 class='main-header'>Individual Profile Analysis</h2>", unsafe_allow_html=True)
     with st.form("single_entry"):
@@ -90,7 +88,7 @@ if mode == "Individual Scan":
 
     if btn:
         with st.spinner("AI is analyzing..."):
-            # Sabhi 13 columns model training ke order mein
+            # Model expectation ke hisaab se exactly 13 columns
             full_data = pd.DataFrame([{
                 'person_age': 25, 'person_gender': 'male', 'person_education': 'bachelor',
                 'person_income': float(income), 'person_emp_exp': float(exp),
@@ -102,10 +100,8 @@ if mode == "Individual Scan":
             }])
             
             try:
-                # Prediction logic
                 raw_prob = pipeline.predict_proba(full_data)[0][1]
-                
-                # Risk Logic Flip
+                # Logic Flip for reliability
                 risk = (1.0 - raw_prob if raw_prob < 0.5 else raw_prob) if default == 'yes' else (raw_prob if raw_prob < 0.5 else 1.0 - raw_prob)
                 
                 st.divider()
@@ -121,29 +117,29 @@ if mode == "Individual Scan":
                     fig.update_layout(height=230, margin=dict(t=0, b=0), paper_bgcolor='rgba(0,0,0,0)', font={'color': "white"})
                     st.plotly_chart(fig, use_container_width=True)
             except Exception as e:
-                st.error(f"Model Error: {e}")
+                st.error(f"Prediction Error: {e}")
 
-# ================= 6. BATCH SCAN =================
+# ================= 6. MODE 2: BATCH SCAN =================
 else:
-    st.markdown("<h2 class='main-header'>Bulk Applicant Processing</h2>", unsafe_allow_html=True)
-    file = st.file_uploader("Upload CSV", type="csv")
+    st.markdown("<h2 class='main-header'>High-Capacity Batch Processing</h2>", unsafe_allow_html=True)
+    file = st.file_uploader("Upload Applicant CSV", type="csv")
     if file:
         df = pd.read_csv(file)
         if st.button("⚡ EXECUTE MASSIVE SCAN"):
             try:
                 raw_probs = pipeline.predict_proba(df)[:, 1]
                 df['Risk_Score'] = raw_probs
-                # Logic Flip for Bulk
+                # Vectorized Logic Flip
                 mask_yes = df['previous_loan_defaults_on_file'].str.lower() == 'yes'
                 df['Risk_Score'] = np.where(mask_yes, 
                                             np.where(df['Risk_Score'] < 0.5, 1.0 - df['Risk_Score'], df['Risk_Score']),
                                             np.where(df['Risk_Score'] > 0.5, 1.0 - df['Risk_Score'], df['Risk_Score']))
                 
                 df['Status'] = np.where(df['Risk_Score'] < 0.25, '✅ APPROVED', '❌ REJECTED')
-                st.success("Batch Processing Complete!")
+                st.success("Analysis Complete!")
                 st.plotly_chart(px.pie(df, names='Status', color='Status', color_discrete_map={'✅ APPROVED':'#10a37f','❌ REJECTED':'#ff4b4b'}))
                 st.dataframe(df.style.applymap(lambda x: 'color: #10a37f; font-weight: bold' if x == '✅ APPROVED' else 'color: #ff4b4b; font-weight: bold', subset=['Status']))
             except Exception as e:
-                st.error(f"Batch Analysis Error: {e}")
+                st.error(f"Batch Error: {e}")
 
-st.markdown("<div class='footer'>Developed @2026 by Prajwal Rajput</div>", unsafe_allow_html=True)
+st.markdown("<div class='footer'>Developed by Prajwal Rajput</div>", unsafe_allow_html=True)
