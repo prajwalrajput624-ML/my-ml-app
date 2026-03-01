@@ -57,7 +57,7 @@ def load_loan_model():
 model = load_loan_model()
 
 # --- UI Header ---
-st.markdown("<h1 class='header-text'>🛡️ Loan Approval AI-system</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='header-text'>🛡️Loan Approval-AI</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; color: #64748b;'>Credit Risk Intelligence & Financial Health Validator</p>", unsafe_allow_html=True)
 
 # --- Input Form ---
@@ -156,3 +156,4 @@ if submit:
 
 # --- Branding Footer ---
 st.markdown("<p class='footer-text'>Developed by Prajwal Rajput</p>", unsafe_allow_html=True)
+
