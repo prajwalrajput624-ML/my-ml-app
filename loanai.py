@@ -24,22 +24,28 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. PDF Generator Function
+# 3. PDF Generator Function (Unicode Safe - No Emojis inside PDF)
 def generate_pdf(data_dict):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt="🛡️ LOAN ASSESSMENT OFFICIAL REPORT", ln=True, align='C')
+    
+    # Header - Emojis removed to prevent Latin-1 encoding errors
+    pdf.cell(200, 10, txt="LOAN ASSESSMENT OFFICIAL REPORT", ln=True, align='C')
     pdf.ln(10)
     
     pdf.set_font("Arial", size=12)
     for key, value in data_dict.items():
-        pdf.cell(200, 10, txt=f"{key}: {value}", ln=True)
+        # Encode and decode to strip any non-latin characters that crash FPDF
+        clean_line = f"{key}: {value}".encode('ascii', 'ignore').decode('ascii')
+        pdf.cell(200, 10, txt=clean_line, ln=True)
     
     pdf.ln(10)
     pdf.set_font("Arial", 'I', 10)
-    pdf.cell(200, 10, txt="Note: This is an AI-generated risk profile for banking reference.", ln=True)
-    return pdf.output(dest='S').encode('latin-1')
+    pdf.cell(200, 10, txt="Disclaimer: This is an AI-generated risk assessment for bank reference.", ln=True)
+    
+    # Return as bytes
+    return pdf.output()
 
 # 4. Loading Model
 @st.cache_resource
@@ -47,7 +53,7 @@ def load_loan_model():
     try:
         with open('loan_models.pkl', 'rb') as f:
             return pickle.load(f)
-    except Exception as e:
+    except Exception:
         return None
 
 model = load_loan_model()
@@ -90,19 +96,20 @@ with st.form("loan_form"):
 # --- Logic & Results ---
 if submit:
     if model is None:
-        st.error("Model file 'loan_models.pkl' not found!")
+        st.error("Model file 'loan_models.pkl' not found! Check your repository.")
     else:
         # 1. Calculations
         dti_ratio = loan_amt / income
         monthly_interest = (int_rate / 100) / 12
+        # Fixed 60 months tenure
         emi = (loan_amt * monthly_interest * (1 + monthly_interest)**60) / ((1 + monthly_interest)**60 - 1)
 
-        # 2. Hard-Rule Safety Check
+        # 2. Pre-Model Filter
         if dti_ratio > 0.60 or credit_score < 450:
             st.error("### ❌ Application Denied")
-            st.warning(f"High Debt-to-Income Ratio ({dti_ratio:.1%}) or Low Credit Score ({credit_score}).")
+            st.warning(f"High DTI ({dti_ratio:.1%}) or Low FICO ({credit_score}).")
         else:
-            # 3. Model Inference
+            # 3. Model Prediction
             input_data = pd.DataFrame({
                 'person_age': [age], 'person_income': [income], 'person_emp_exp': [emp_exp],
                 'loan_amnt': [loan_amt], 'loan_int_rate': [int_rate], 'loan_percent_income': [dti_ratio],
@@ -112,40 +119,42 @@ if submit:
                 'previous_loan_defaults_on_file': [default.lower()]
             })
 
-            # Get Risk Probability
+            # Get Risk
             risk_prob = model.predict_proba(input_data)[0][1] * 100
             
-            # 4. Display Results
+            # 4. Results
             st.markdown("---")
             if risk_prob > 35:
-                st.error(f"### ❌ High Risk Detected: {risk_prob:.1f}%")
-                st.info("Decision: Based on historical data, this profile shows high volatility.")
+                st.error(f"### ❌ High Risk: {risk_prob:.1f}%")
             else:
                 st.success("### ✅ Approval Recommended")
                 st.balloons()
                 
-                res1, res2, res3 = st.columns(3)
-                res1.metric("Risk Score", f"{risk_prob:.1f}%")
-                res2.metric("Monthly EMI", f"${emi:.2f}")
-                res3.metric("DTI Ratio", f"{dti_ratio:.1%}")
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Risk Score", f"{risk_prob:.1f}%")
+                m2.metric("Monthly EMI", f"${emi:.2f}")
+                m3.metric("DTI Ratio", f"{dti_ratio:.1%}")
 
-                # 5. Generate PDF
+                # 5. PDF Generation & Download
                 report_data = {
-                    "Status": "APPROVED",
-                    "Applicant Age": age,
+                    "Decision": "APPROVED",
                     "Annual Income": f"${income:,.2f}",
-                    "Loan Amount": f"${loan_amt:,.2f}",
+                    "Loan Requested": f"${loan_amt:,.2f}",
                     "Credit Score": credit_score,
-                    "Risk Probability": f"{risk_prob:.1f}%",
-                    "Monthly EMI": f"${emi:.2f}"
+                    "Default Probability": f"{risk_prob:.1f}%",
+                    "Estimated EMI": f"${emi:.2f}",
+                    "DTI Ratio": f"{dti_ratio:.1%}"
                 }
-                pdf_bytes = generate_pdf(report_data)
                 
-                st.download_button(
-                    label="📥 Download Approval Report",
-                    data=pdf_bytes,
-                    file_name=f"Loan_Report_{credit_score}.pdf",
-                    mime="application/pdf"
-                )
+                try:
+                    pdf_bytes = generate_pdf(report_data)
+                    st.download_button(
+                        label="📥 Download PDF Report",
+                        data=pdf_bytes,
+                        file_name=f"Loan_Assessment_{credit_score}.pdf",
+                        mime="application/pdf"
+                    )
+                except Exception as e:
+                    st.warning("PDF could not be generated due to special characters.")
 
-st.markdown("<br><p style='text-align: center; color: gray; font-size: 12px;'>Standard 60-month tenure assumed. AI prediction based on historical datasets.</p>", unsafe_allow_html=True)
+st.markdown("<br><p style='text-align: center; color: gray; font-size: 12px;'>Standard 60-month tenure assumed. Built for Financial Risk Analysis.</p>", unsafe_allow_html=True)
