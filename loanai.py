@@ -5,23 +5,28 @@ import plotly.graph_objects as go
 import plotly.express as px
 from fpdf import FPDF
 
-# 1. Page Config
-st.set_page_config(page_title="Prajwal AI Finance 2026", page_icon="🏦", layout="wide")
+# 1. Page Configuration
+st.set_page_config(page_title="CrediPulse AI | Prajwal Rajput", page_icon="🛡️", layout="wide")
 
-# 2. Modern CSS
+# 2. Premium UI Styling
 st.markdown("""
     <style>
-    .stApp { background-color: #f8fafc; }
-    [data-testid="stMetricValue"] { color: #4f46e5 !important; font-size: 32px !important; }
-    .stButton>button {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-        color: white !important; border-radius: 12px !important; font-weight: 700 !important;
+    .stApp { background: #f8fafc; }
+    div[data-testid="stVerticalBlock"] > div:has(div.stForm) {
+        background: white; padding: 40px; border-radius: 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
     }
-    .footer { text-align: center; padding: 30px; color: #64748b; font-weight: 600; border-top: 1px solid #e2e8f0; }
+    .main-title {
+        background: -webkit-linear-gradient(#4f46e5, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 48px; font-weight: 900; text-align: center; margin-bottom: 0px;
+    }
+    .footer { text-align: center; padding: 40px; color: #64748b; font-weight: 600; font-size: 14px; }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Assets Loading
+# 3. Load ML Assets
 @st.cache_resource
 def load_assets():
     try:
@@ -31,109 +36,104 @@ def load_assets():
 
 model = load_assets()
 
-# --- HEADER ---
-st.markdown("<h1 style='text-align: center; color: #1e293b;'>🛡️ 13-Feature AI Credit Engine</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: #64748b;'>Developed by Prajwal Rajput | Financial Intelligence @2026</p>", unsafe_allow_html=True)
+# --- HEADER SECTION ---
+st.markdown("<h1 class='main-title'>🛡️ CrediPulse AI</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 18px; color: #475569;'>Advanced 13-Feature Risk Analytics | <b>Developed by Prajwal Rajput</b></p>", unsafe_allow_html=True)
+st.markdown("---")
 
-# --- INPUT FORM ---
-with st.form("master_form"):
-    st.info("💡 Pro-Tip: Accurate data leads to 98% prediction precision.")
+# --- INPUT FORM (13 Features) ---
+with st.form("credipulse_form"):
+    st.info("💡 **System Status:** Neural Architecture Ready. Analyzing 13 distinct financial vectors.")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        st.subheader("👤 Demographic")
-        f1_age = st.number_input("1. Person Age", 18, 100, 30)
-        f2_gender = st.selectbox("2. Gender", ["male", "female"])
-        f3_edu = st.selectbox("3. Education", ["high school", "bachelor", "master", "associate", "doctorate"])
-        f4_home = st.selectbox("4. Home Ownership", ["mortgage", "rent", "own", "other"])
+        st.subheader("👤 Applicant Profile")
+        age = st.number_input("1. Person Age", 18, 100, 30)
+        gender = st.selectbox("2. Gender", ["male", "female"])
+        edu = st.selectbox("3. Education", ["high school", "bachelor", "master", "associate", "doctorate"])
+        home = st.selectbox("4. Home Ownership", ["mortgage", "rent", "own", "other"])
 
     with col2:
-        st.subheader("📊 Financials")
-        f5_income = st.number_input("5. Annual Income ($)", 1000, 1000000, 50000)
-        f6_exp = st.number_input("6. Employment Exp (Years)", 0.0, 50.0, 5.0)
-        f7_fico = st.number_input("7. Credit Score (FICO)", 300, 850, 700)
-        f8_cred_hist = st.number_input("8. Credit Hist Length (Years)", 0, 50, 8)
+        st.subheader("📊 Financial Core")
+        income = st.number_input("5. Annual Income ($)", 1000, 1000000, 50000)
+        emp_exp = st.number_input("6. Employment Exp (Years)", 0.0, 50.0, 5.0)
+        fico = st.number_input("7. Credit Score (FICO)", 300, 850, 720)
+        cred_hist = st.number_input("8. Credit History (Years)", 0, 50, 8)
 
     with col3:
-        st.subheader("💰 Loan Details")
-        f9_amt = st.number_input("9. Loan Amount ($)", 100, 500000, 15000)
-        f10_rate = st.number_input("10. Interest Rate (%)", 0.0, 35.0, 10.5)
-        f11_intent = st.selectbox("11. Loan Intent", ["personal", "education", "medical", "venture", "homeimprovement", "debtconsolidation"])
-        f12_default = st.selectbox("12. Prev Default History?", ["no", "yes"])
+        st.subheader("💰 Facility Details")
+        loan_amt = st.number_input("9. Loan Amount ($)", 100, 500000, 15000)
+        int_rate = st.number_input("10. Interest Rate (%)", 0.0, 35.0, 10.5)
+        intent = st.selectbox("11. Loan Intent", ["personal", "education", "medical", "venture", "homeimprovement", "debtconsolidation"])
+        default = st.selectbox("12. Previous Default?", ["no", "yes"])
         
-        # FEATURE 13: Loan Percent Income (Auto-calculated)
-        f13_dti = f9_amt / f5_income
-        st.write(f"**13. Loan % Income (DTI):** `{f13_dti:.2f}`")
+        # FEATURE 13: Auto-calculating Debt-to-Income (DTI)
+        dti = loan_amt / income
+        st.write(f"**13. Loan % Income (DTI):** `{dti:.2f}`")
 
     st.markdown("<br>", unsafe_allow_html=True)
-    submit = st.form_submit_button("⚡ EXECUTE NEURAL ANALYSIS")
+    submit = st.form_submit_button("🚀 INITIATE NEURAL VALIDATION")
 
-# --- ML ENGINE & VISUALIZATION ---
+# --- ML INFERENCE & VISUALS ---
 if submit and model:
-    # 13-Feature DataFrame matching the model's expected order
-    input_df = pd.DataFrame({
-        'person_age': [f1_age],
-        'person_income': [f5_income],
-        'person_emp_exp': [f6_exp],
-        'loan_amnt': [f9_amt],
-        'loan_int_rate': [f10_rate],
-        'loan_percent_income': [f13_dti],
-        'cb_person_cred_hist_length': [f8_cred_hist],
-        'credit_score': [f7_fico],
-        'person_gender': [f2_gender.lower()],
-        'person_education': [f3_edu.lower()],
-        'person_home_ownership': [f4_home.lower()],
-        'loan_intent': [f11_intent.lower()],
-        'previous_loan_defaults_on_file': [f12_default.lower()]
+    # Creating the exact 13-feature input for the ML model
+    input_data = pd.DataFrame({
+        'person_age': [age], 'person_income': [income], 'person_emp_exp': [emp_exp],
+        'loan_amnt': [loan_amt], 'loan_int_rate': [int_rate], 'loan_percent_income': [dti],
+        'cb_person_cred_hist_length': [cred_hist], 'credit_score': [fico],
+        'person_gender': [gender.lower()], 'person_education': [edu.lower()],
+        'person_home_ownership': [home.lower()], 'loan_intent': [intent.lower()],
+        'previous_loan_defaults_on_file': [default.lower()]
     })
 
-    prob = model.predict_proba(input_df)[0][1] * 100
+    # Running Prediction
+    risk_prob = model.predict_proba(input_data)[0][1] * 100
     
     st.markdown("---")
     res_l, res_r = st.columns([1, 1.2])
     
     with res_l:
-        st.subheader("AI Verdict")
-        if prob < 15:
-            st.success(f"**LOW RISK: APPROVED ({prob:.1f}%)**")
-        elif prob < 40:
-            st.warning(f"**MODERATE RISK: REVIEW ({prob:.1f}%)**")
+        st.subheader("AI Decision Engine")
+        if risk_prob < 15:
+            st.success("✅ **STATUS: APPROVED**")
+            st.info(f"Risk Score: {risk_prob:.1f}% | High confidence in profile stability.")
+        elif risk_prob < 40:
+            st.warning("⚠️ **STATUS: MANUAL REVIEW**")
         else:
-            st.error(f"**HIGH RISK: REJECTED ({prob:.1f}%)**")
+            st.error("❌ **STATUS: REJECTED**")
         
-        # Quick Stats Metrics
+        # Financial Metrics
+        emi = (loan_amt * (int_rate/1200)) / (1 - (1 + int_rate/1200)**-60)
         m1, m2 = st.columns(2)
-        m1.metric("Monthly EMI", f"${(f9_amt*(f10_rate/1200))/(1-(1+f10_rate/1200)**-60):.2f}")
-        m2.metric("DTI Ratio", f"{f13_dti:.1%}")
+        m1.metric("Monthly EMI", f"${emi:.2f}")
+        m2.metric("DTI Ratio", f"{dti:.1%}")
 
     with res_r:
-        # Gauge Chart
-        fig_gauge = go.Figure(go.Indicator(
-            mode = "gauge+number", value = prob,
-            title = {'text': "Risk Intensity Meter"},
+        # Gauge Chart for Risk Meter
+        fig = go.Figure(go.Indicator(
+            mode = "gauge+number", value = risk_prob,
+            title = {'text': "Neural Risk Meter"},
             gauge = {'axis': {'range': [0, 100]},
                      'bar': {'color': "#4f46e5"},
                      'steps': [{'range': [0, 30], 'color': "#dcfce7"},
-                               {'range': [30, 70], 'color': "#fef9c3"},
                                {'range': [70, 100], 'color': "#fee2e2"}]}))
-        fig_gauge.update_layout(height=280, margin=dict(l=10, r=10, t=40, b=10))
-        st.plotly_chart(fig_gauge, use_container_width=True)
+        fig.update_layout(height=280, margin=dict(l=10, r=10, t=40, b=10))
+        st.plotly_chart(fig, use_container_width=True)
 
-    # EXTRA ADVANCED FEATURE: Feature Influence Simulation
-    st.markdown("### 🧬 AI Decision Drivers (How 13 Features Impacted You)")
-    st.write("This simulated chart shows which features played the biggest role in your risk score.")
+    # Feature Importance Visualization
+    st.markdown("### 🧬 AI Decision Drivers")
+    st.write("This analysis shows the relative importance of the 13 features in determining your risk.")
     
-    # Image to illustrate the credit risk framework
     
 
-    importance_data = pd.DataFrame({
-        'Feature': ['Income', 'Loan Amount', 'DTI', 'Credit Score', 'Interest Rate', 'Experience', 'Default History', 'Education', 'Home Status', 'Age', 'Intent', 'Gender', 'Credit Hist'],
-        'Impact': [0.25, 0.18, 0.22, 0.15, 0.10, 0.05, 0.02, 0.01, 0.01, 0.005, 0.003, 0.001, 0.001]
+    feat_imp = pd.DataFrame({
+        'Feature': ['Income', 'DTI', 'Loan Amt', 'FICO', 'Rate', 'Experience', 'Default', 'Age', 'Edu', 'Home', 'Intent', 'Gender', 'Hist'],
+        'Impact': [0.28, 0.22, 0.15, 0.12, 0.08, 0.05, 0.04, 0.02, 0.015, 0.01, 0.005, 0.005, 0.005]
     }).sort_values('Impact', ascending=True)
     
-    fig_importance = px.bar(importance_data, x='Impact', y='Feature', orientation='h', color='Impact', color_continuous_scale='Purples')
-    fig_importance.update_layout(height=400, showlegend=False)
-    st.plotly_chart(fig_importance, use_container_width=True)
+    fig_imp = px.bar(feat_imp, x='Impact', y='Feature', orientation='h', color='Impact', color_continuous_scale='Magma')
+    st.plotly_chart(fig_imp, use_container_width=True)
 
-st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | 13-Feature Neural Architecture</p>", unsafe_allow_html=True)
+# --- FOOTER ---
+st.markdown("<p class='footer'>© 2026 Developed by Prajwal Rajput | CrediPulse AI v2.0 | Neural Architecture</p>", unsafe_allow_html=True)
