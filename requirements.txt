@@ -10,6 +10,7 @@ xgboost
 fpdf2
 tensorflow
 joblib
+imblearn
 
 
 
