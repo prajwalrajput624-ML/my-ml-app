@@ -11,7 +11,10 @@ fpdf2
 tensorflow
 joblib
 imblearn
-
+gunicorn 
+flask
+flask-sqlalchemy
+pymysql
 
 
 
